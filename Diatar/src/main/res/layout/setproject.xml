@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="wrap_content"
+	android:orientation="vertical">
+
+	<ScrollView
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:layout_weight="1.0">
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:orientation="vertical">
+
+			<GridLayout
+				columnCount="1"
+				rowCount="1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:columnCount="3">
+
+				<ToggleButton
+					android:id="@+id/setBold"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="12"
+					android:layout_column="2"
+					android:textOff="Normál"
+					android:textOn="Vastag" />
+
+				<TextView
+					android:id="@+id/textView"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="12"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Félkövér:" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Háttér szín:" />
+
+				<CheckBox
+					android:id="@+id/setBkColorCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<Button
+					android:id="@+id/setBkColorBtn"
+					style="?android:attr/buttonStyleSmall"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="2"
+					android:layout_marginLeft="2dp"
+					android:layout_marginRight="2dp"
+					android:onClick="onColorBtn"
+					android:text="szín"
+					android:textColor="#000000" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Szöveg szín:" />
+
+				<CheckBox
+					android:id="@+id/setTxColorCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<Button
+					android:id="@+id/setTxColorBtn"
+					style="?android:attr/buttonStyleSmall"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="2"
+					android:layout_marginLeft="2dp"
+					android:layout_marginRight="2dp"
+					android:onClick="onColorBtn"
+					android:text="szín"
+					android:textColor="#000000" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="2"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Inaktív szín:" />
+
+				<CheckBox
+					android:id="@+id/setBlankColorCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="2"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<Button
+					android:id="@+id/setBlankColorBtn"
+					style="?android:attr/buttonStyleSmall"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="2"
+					android:layout_column="2"
+					android:layout_marginLeft="2dp"
+					android:layout_marginRight="2dp"
+					android:onClick="onColorBtn"
+					android:text="szín"
+					android:textColor="#000000" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="3"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Kiemelt szín:" />
+
+				<CheckBox
+					android:id="@+id/setHighColorCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="3"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<Button
+					android:id="@+id/setHighColorBtn"
+					style="?android:attr/buttonStyleSmall"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="3"
+					android:layout_column="2"
+					android:layout_marginLeft="2dp"
+					android:layout_marginRight="2dp"
+					android:onClick="onColorBtn"
+					android:text="szín"
+					android:textColor="#000000" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="4"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Betűméret:" />
+
+				<CheckBox
+					android:id="@+id/setFontSizeCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="4"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<EditText
+					android:id="@+id/setFontSize"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="4"
+					android:layout_column="2"
+					android:ems="10"
+					android:inputType="number" />
+
+				<TextView
+					android:id="@+id/setUseTitleLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="5"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Címsor:" />
+
+				<ToggleButton
+					android:id="@+id/setUseTitle"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="5"
+					android:layout_column="2" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="6"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Cím méret:" />
+
+				<CheckBox
+					android:id="@+id/setTitleSizeCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="6"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<EditText
+					android:id="@+id/setTitleSize"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="6"
+					android:layout_column="2"
+					android:ems="10"
+					android:inputType="number" />
+
+				<TextView
+					android:id="@+id/setAutoSizeLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="7"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Kicsinyítés:" />
+
+				<ToggleButton
+					android:id="@+id/setAutoSize"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="7"
+					android:layout_column="2" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="8"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Bal behúzás:" />
+
+				<CheckBox
+					android:id="@+id/setIndentCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="8"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<EditText
+					android:id="@+id/setLeftIndent"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="8"
+					android:layout_column="2"
+					android:ems="10"
+					android:inputType="number" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="9"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Sorköz:" />
+
+				<CheckBox
+					android:id="@+id/setSpacingCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="9"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<Spinner
+					android:id="@+id/setSpacing"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="9"
+					android:layout_column="2"
+					android:entries="@array/setprojspacingitems" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="10"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Vízszintes:" />
+
+				<CheckBox
+					android:id="@+id/setHCenterCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="10"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<ToggleButton
+					android:id="@+id/setHCenter"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="10"
+					android:layout_column="2"
+					android:onClick="onEdClick"
+					android:textOff="Balra"
+					android:textOn="Középre" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="11"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Függőleges:" />
+
+				<CheckBox
+					android:id="@+id/setVCenterCk"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="11"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical"
+					android:onClick="onCbClick" />
+
+				<ToggleButton
+					android:id="@+id/setVCenter"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="11"
+					android:layout_column="2"
+					android:onClick="onEdClick"
+					android:textOff="Fentre"
+					android:textOn="Középre" />
+
+				<TextView
+					android:id="@+id/setBlankPicLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="13"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Háttérkép:" />
+
+				<TextView
+					android:id="@+id/setBlankPic"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_row="13"
+					android:layout_column="2"
+					android:layout_gravity="center_vertical|fill_horizontal"
+					android:background="#DBDBDB"
+					android:paddingLeft="2dp"
+					android:paddingTop="2dp"
+					android:paddingBottom="2dp"
+					android:text="Text"
+					android:textAppearance="?android:attr/textAppearanceSmall" />
+
+				<TextView
+					android:id="@+id/setBgModeLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="14"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Kitöltés:" />
+
+				<Spinner
+					android:id="@+id/setBgMode"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="14"
+					android:layout_column="2"
+					android:entries="@array/setprojbgmode" />
+
+				<TextView
+					android:id="@+id/setUseAccordLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="15"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Akkordok:" />
+
+				<ToggleButton
+					android:id="@+id/setUseAccord"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="15"
+					android:layout_column="2" />
+
+				<TextView
+					android:id="@+id/setUseKottaLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="16"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Kotta:" />
+
+				<ToggleButton
+					android:id="@+id/setUseKotta"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="16"
+					android:layout_column="2" />
+
+				<TextView
+					android:id="@+id/setAkkordAranyLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="17"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Akkord arány:" />
+
+				<Spinner
+					android:id="@+id/setAkkordArany"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="17"
+					android:layout_column="2"
+					android:entries="@array/setprojxarany" />
+
+				<TextView
+					android:id="@+id/setKottaAranyLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="18"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Kotta arány:" />
+
+				<Spinner
+					android:id="@+id/setKottaArany"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="18"
+					android:layout_column="2"
+					android:entries="@array/setprojxarany" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="19"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Háttér átlátszó:" />
+
+				<Spinner
+					android:id="@+id/setBackTrans"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="19"
+					android:layout_column="2"
+					android:entries="@array/setprojtrans" />
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="20"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"
+					android:text="Inaktív átlátszó:" />
+
+				<Spinner
+					android:id="@+id/setBlankTrans"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="20"
+					android:layout_column="2"
+					android:entries="@array/setprojtrans" />
+
+			</GridLayout>
+
+			<TextView
+				android:id="@+id/setBordersLbl"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="DiaVetítő margók:" />
+
+			<GridLayout
+				columnCount="1"
+				rowCount="1"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:columnCount="5">
+
+				<TextView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="0"
+					android:text="    " />
+
+				<TextView
+					android:id="@+id/setBorderLLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="1"
+					android:layout_gravity="right|center_vertical"
+					android:text="Bal:" />
+
+				<EditText
+					android:id="@+id/setBorderL"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="2"
+					android:ems="5"
+					android:inputType="numberDecimal" />
+
+				<TextView
+					android:id="@+id/setBorderRLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="3"
+					android:layout_gravity="right|center_vertical"
+					android:text="Jobb:" />
+
+				<EditText
+					android:id="@+id/setBorderR"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="0"
+					android:layout_column="4"
+					android:ems="5"
+					android:inputType="numberDecimal" />
+
+				<TextView
+					android:id="@+id/setBorderTLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="1"
+					android:layout_gravity="right|center_vertical"
+					android:text="Felső:" />
+
+				<EditText
+					android:id="@+id/setBorderT"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="2"
+					android:ems="5"
+					android:inputType="numberDecimal" />
+
+				<TextView
+					android:id="@+id/setBorderBLbl"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="3"
+					android:layout_gravity="right|center_vertical"
+					android:text="Alsó:" />
+
+				<EditText
+					android:id="@+id/setBorderB"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_row="1"
+					android:layout_column="4"
+					android:ems="5"
+					android:inputType="numberDecimal" />
+
+			</GridLayout>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonBarStyle"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Mégse"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onCancel"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Ok"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onOk"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

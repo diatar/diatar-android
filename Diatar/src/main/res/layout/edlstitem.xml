@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="horizontal">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:orientation="vertical"
+			android:layout_gravity="center_vertical">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text=" + "
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:layout_width="wrap_content"
+				android:background="#CACACA"
+				android:gravity="center"
+				android:shadowRadius="1.0"
+				android:shadowColor="#FFFFFF"
+				android:shadowDx="1.0"
+				android:shadowDy="1.0"
+				android:id="@+id/editemAdd"
+				android:layout_gravity="center_vertical"/>
+
+		</LinearLayout>
+
+		<CheckBox
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:id="@+id/editemSel"/>
+
+		<TextView
+			android:id="@+id/editemDbl"
+			android:layout_width="30dp"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="0"
+			android:background="#CDDC39"
+			android:text=" "
+			android:textSize="24sp" />
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:text="Text"
+			android:layout_width="wrap_content"
+			android:id="@+id/editemTxt"
+			android:paddingLeft="4dp"
+			android:layout_gravity="center_vertical"
+			android:layout_weight="1.0"/>
+
+		<TextView
+			android:id="@+id/editemOrder"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="right|center_vertical"
+			android:layout_marginLeft="2dp"
+			android:layout_marginRight="2dp"
+			android:onClick="onDelBtn"
+			android:text=" ↕ "
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:textColor="#FF0000"
+			android:textSize="24sp" />
+
+	</LinearLayout>
+
+</LinearLayout>
+

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<ScrollView
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:layout_weight="1.0">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
+
+			<GridLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				rowCount="1"
+				columnCount="1"
+				android:layout_gravity="center_horizontal"
+				android:columnCount="4">
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Fekete"
+					android:layout_width="wrap_content"
+					android:background="#000000"
+					android:textColor="#FFFFFF"
+					android:textSize="8sp"
+					android:id="@+id/cdFbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Kék"
+					android:layout_width="wrap_content"
+					android:background="#0000FF"
+					android:textColor="#FFFFFF"
+					android:textSize="10sp"
+					android:id="@+id/cdKbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Zöld"
+					android:layout_width="wrap_content"
+					android:background="#00FF00"
+					android:textColor="#000000"
+					android:textSize="10sp"
+					android:id="@+id/cdZbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Cián"
+					android:layout_width="wrap_content"
+					android:background="#00FFFF"
+					android:textColor="#000000"
+					android:textSize="10sp"
+					android:id="@+id/cdCbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Piros"
+					android:layout_width="wrap_content"
+					android:textSize="10sp"
+					android:background="#FF0000"
+					android:textColor="#FFFFFF"
+					android:id="@+id/cdPbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Lila"
+					android:layout_width="wrap_content"
+					android:background="#FF00FF"
+					android:textSize="10sp"
+					android:textColor="#000000"
+					android:id="@+id/cdLbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Sárga"
+					android:layout_width="wrap_content"
+					android:background="#FFFF00"
+					android:textSize="9sp"
+					android:textColor="#000000"
+					android:id="@+id/cdSbtn"
+					android:onClick="onColorBtn"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="Fehér"
+					android:layout_width="wrap_content"
+					android:background="#FFFFFF"
+					android:textSize="10sp"
+					android:textColor="#000000"
+					android:id="@+id/cdHbtn"
+					android:onClick="onColorBtn"/>
+
+			</GridLayout>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="horizontal"
+				android:layout_gravity="center_horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Fényerő:"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"/>
+
+				<Spinner
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:entries="@array/colorpercentitems"
+					android:id="@+id/cdPercLst"/>
+
+			</LinearLayout>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="Color"
+				android:layout_width="match_parent"
+				android:gravity="center_horizontal"
+				android:id="@+id/cdColor"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:background="#0000FF"
+				android:padding="4dp"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="R"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="-"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdRsub"
+					android:onClick="onAddSubBtn"/>
+
+				<SeekBar
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:layout_weight="1.0"
+					android:id="@+id/cdRseek"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="+"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdRadd"
+					android:onClick="onAddSubBtn"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="255"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdRnum"
+					android:gravity="right"/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="G"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="-"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdGsub"
+					android:onClick="onAddSubBtn"/>
+
+				<SeekBar
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:layout_weight="1.0"
+					android:id="@+id/cdGseek"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="+"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdGadd"
+					android:onClick="onAddSubBtn"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="255"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdGnum"
+					android:gravity="right"/>
+
+			</LinearLayout>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:orientation="horizontal">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="B"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="-"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdBsub"
+					android:onClick="onAddSubBtn"/>
+
+				<SeekBar
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:layout_weight="1.0"
+					android:id="@+id/cdBseek"/>
+
+				<Button
+					android:layout_height="wrap_content"
+					style="?android:attr/buttonStyleSmall"
+					android:text="+"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdBadd"
+					android:onClick="onAddSubBtn"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="255"
+					android:layout_width="wrap_content"
+					android:layout_gravity="center_vertical"
+					android:id="@+id/cdBnum"
+					android:gravity="right"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonBarStyle"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:layout_gravity="bottom">
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Mégse"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:id="@+id/cdCancelBtn"
+			android:onClick="onFinishBtn"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Ok"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:id="@+id/cdOkBtn"
+			android:onClick="onFinishBtn"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

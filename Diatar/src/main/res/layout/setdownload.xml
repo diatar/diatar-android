@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:text="Letölthető énektárak ellenőrzése:"
+		android:layout_width="wrap_content"/>
+
+	<Spinner
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:entries="@array/setdownlstitems"
+		android:id="@+id/setDownLst"/>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:text="Utoljára:"
+		android:layout_width="wrap_content"
+		android:id="@+id/setDownLastDay"/>
+
+	<Button
+		android:layout_height="wrap_content"
+		android:text="Ellenőrzés most"
+		android:layout_width="wrap_content"
+		android:id="@+id/setDownNowBtn"
+		android:onClick="onDownNowBtn"
+		android:layout_gravity="center|center_vertical"/>
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:text="Saját DTX fájlok könyvtára:"
+		android:layout_width="wrap_content"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<EditText
+			android:layout_height="wrap_content"
+			android:ems="10"
+			android:layout_width="match_parent"
+			android:id="@+id/setDownDtx2DirEd"
+			android:layout_weight="1.0"
+			android:layout_gravity="left|center_vertical"
+			android:ellipsize="start"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonStyleSmall"
+			android:text="..."
+			android:layout_width="wrap_content"
+			android:layout_gravity="right|center_vertical"
+			android:id="@+id/setDownDtx2DirBtn"
+			android:onClick="onDtx2DirBtn"/>
+
+	</LinearLayout>
+
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/setDownAlwaysOn"
+		android:text="Képernyő mindig be"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonBarStyle"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Mégse"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onCancel"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Ok"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onOk"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

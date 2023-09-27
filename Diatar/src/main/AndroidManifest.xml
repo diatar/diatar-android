@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="diatar.eu" >
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+
+	<application
+        android:allowBackup="true"
+        android:icon="@drawable/dt3"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+		android:resizeableActivity = "true"
+		android:usesCleartextTraffic="true"
+		android:requestLegacyExternalStorage="true"
+	>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+			android:exported="true"
+	    >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+		</activity>
+		<activity
+			android:name=".ColorDlg"
+			android:theme="@android:style/Theme.Holo.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".EditActivity"
+		>
+		</activity>
+		<activity
+			android:name=".EdSep"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".EdDtx"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".FileSelectorActivity"
+			android:label="Fájl kiválasztása"
+			android:theme="@android:style/Theme.Holo.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".DiaLoader"
+			android:label="Betöltés"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".RenameFile"
+			android:label="Átnevezés / Törlés"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".AskYesNo"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".SetNet"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".SetProj"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".SetDownload"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+		<activity
+			android:name=".SetAbout"
+			android:theme="@android:style/Theme.Holo.Light.Dialog" 
+		>
+		</activity>
+    </application>
+
+</manifest>

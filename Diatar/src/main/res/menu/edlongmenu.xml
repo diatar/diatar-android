@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/mnEdLongProp"
+        android:title="Tulajdonságok"/>
+    <item
+        android:id="@+id/mnEdLongDel"
+        android:title="Törlés"/>
+</menu>

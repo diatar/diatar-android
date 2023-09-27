@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent">
+
+	<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="Diatár Vetítő"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:layout_width="match_parent"
+				android:gravity="center_horizontal"
+				android:typeface="serif"
+				android:shadowColor="#835559"
+				android:textColor="#434ECE"
+				android:shadowDx="3.0"
+				android:shadowDy="3.0"
+				android:textStyle="bold|italic"
+				android:background="#4BEF96"
+				android:paddingTop="10dp"
+				android:elevation="10dp"
+				android:shadowRadius="1.0"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="ver"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="match_parent"
+				android:background="#4BEF96"
+				android:gravity="center_horizontal"
+				android:id="@+id/VerTxt"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="Androidos segédprogram távoli vetítéshez"
+				android:layout_width="match_parent"
+				android:layout_gravity="center_horizontal"
+				android:gravity="center_horizontal"
+				android:background="#4BEF96"
+				android:paddingBottom="10dp"/>
+
+			<View
+				android:layout_height="1dp"
+				android:background="?android:attr/dividerVertical"
+				android:layout_width="match_parent"/>
+
+		</LinearLayout>
+
+		<TextView
+			android:layout_height="wrap_content"
+			android:text="IP"
+			android:layout_width="match_parent"
+			android:id="@+id/IpTxt"
+			android:gravity="center_horizontal"/>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="Port:"
+				android:layout_width="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:gravity="center_horizontal"/>
+
+			<EditText
+				android:layout_height="wrap_content"
+				android:inputType="number"
+				android:ems="10"
+				android:layout_width="wrap_content"
+				android:id="@+id/PortEd"
+				android:gravity="center_horizontal"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:orientation="horizontal">
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_vertical"
+				android:text="Margók:"
+				android:textAppearance="?android:attr/textAppearanceMedium" />
+
+			<CheckBox
+				android:id="@+id/B2CCk"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="onB2C"
+				android:text="Vezérlő küldi" />
+
+		</LinearLayout>
+
+		<GridLayout
+			columnCount="1"
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			rowCount="1"
+			android:columnCount="4"
+			android:rowCount="3">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Bal:"
+				android:layout_column="0"
+				android:layout_row="0"
+				android:layout_gravity="right|center_vertical"/>
+
+			<EditText
+				android:inputType="numberDecimal"
+				android:layout_width="wrap_content"
+				android:ems="5"
+				android:layout_height="wrap_content"
+				android:layout_column="1"
+				android:layout_row="0"
+				android:id="@+id/ClipL"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Jobb:"
+				android:layout_column="2"
+				android:layout_row="0"
+				android:layout_gravity="right|center_vertical"/>
+
+			<EditText
+				android:inputType="numberDecimal"
+				android:layout_width="wrap_content"
+				android:ems="5"
+				android:layout_height="wrap_content"
+				android:id="@+id/ClipR"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Felső:"
+				android:layout_column="0"
+				android:layout_row="1"
+				android:layout_gravity="right|center_vertical"/>
+
+			<EditText
+				android:inputType="numberDecimal"
+				android:layout_width="wrap_content"
+				android:ems="5"
+				android:layout_height="wrap_content"
+				android:layout_row="1"
+				android:layout_column="1"
+				android:id="@+id/ClipT"/>
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Alsó:"
+				android:layout_row="1"
+				android:layout_column="2"
+				android:layout_gravity="right|center_vertical"/>
+
+			<EditText
+				android:inputType="numberDecimal"
+				android:layout_width="wrap_content"
+				android:ems="5"
+				android:layout_height="wrap_content"
+				android:layout_row="1"
+				android:layout_column="3"
+				android:id="@+id/ClipB"/>
+
+			<CheckBox
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_row="2"
+				android:layout_column="0"
+				android:layout_columnSpan="2"
+				android:text="Tükrözés"
+				android:layout_gravity="center_vertical|center_horizontal"
+				android:id="@+id/MirrorCb"/>
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Forgatás:"
+				android:layout_column="2"
+				android:layout_row="2"
+				android:layout_gravity="right|center_vertical"/>
+
+			<Spinner
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:entries="@array/setrotate"
+				android:id="@+id/RotLst"/>
+
+		</GridLayout>
+
+		<View
+			android:background="?android:attr/dividerVertical"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"/>
+
+		<CheckBox
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="Automatikus indítás bekapcsoláskor"
+			android:id="@+id/BootCk"/>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal">
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonStyleSmall"
+				android:text="Kilép"
+				android:layout_width="wrap_content"
+				android:id="@+id/btnStop"
+				android:layout_weight="1.0"
+				android:onClick="onExit"/>
+
+			<Button
+				android:id="@+id/btnShutdown"
+				style="?android:attr/buttonStyleSmall"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:onClick="onShutdown"
+				android:text="Leállít"
+				android:visibility="visible" />
+
+			<Button
+				android:id="@+id/btnReboot"
+				style="?android:attr/buttonStyleSmall"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1.0"
+				android:onClick="onReboot"
+				android:text="Újraindít"
+				android:visibility="visible" />
+
+		</LinearLayout>
+
+		<TextView
+			android:id="@+id/textView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:text="(Figyelem! A leállítás és újraindítás védett funkció, csak Root-olt készüléken elképzelhető)" />
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarStyle"
+			android:layout_width="match_parent"
+			android:orientation="horizontal">
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonBarButtonStyle"
+				android:text="Mégse"
+				android:layout_width="match_parent"
+				android:layout_weight="1.0"
+				android:onClick="onCancel"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonBarButtonStyle"
+				android:text="Ok"
+				android:layout_width="match_parent"
+				android:layout_weight="1.0"
+				android:onClick="onOk"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</ScrollView>
+

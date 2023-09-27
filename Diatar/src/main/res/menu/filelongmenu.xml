@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mnFileLongNew"
+        android:title="Új alkönyvtár"/>
+	<item
+        android:id="@+id/mnFileLongRen"
+        android:title="Átnevez"/>
+    <item
+        android:id="@+id/mnFileLongDel"
+        android:title="Töröl"/>
+	<item
+        android:id="@+id/mnFileLongCut"
+        android:title="Kivág"/>
+	<item
+        android:id="@+id/mnFileLongCopy"
+        android:title="Másol"/>
+	<item
+        android:id="@+id/mnFileLongInsert"
+        android:title="Beilleszt"/>
+</menu>

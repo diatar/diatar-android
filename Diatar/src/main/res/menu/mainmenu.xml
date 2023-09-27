@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/mnLoad"
+        android:title="Betölt"/>
+    <item
+        android:id="@+id/mnEdit"
+        android:title="Szerkeszt"/>
+    <item
+        android:id="@+id/mnSave"
+        android:title="Ment"/>
+    <item
+        android:id="@+id/mnSets"
+        android:title="Beállít">
+		<menu>
+			<item
+				android:id="@+id/mnSetDownload"
+				android:title="Program..."/>
+			<item
+				android:id="@+id/mnSetNet"
+				android:title="Hálózat..."/>
+			<item
+				android:id="@+id/mnSetProject"
+				android:title="Vetítés..."/>
+			<item
+				android:id="@+id/mnSetAbout"
+				android:title="Névjegy..."/>
+		</menu>
+	</item>
+	<item
+		android:id="@+id/mnStop"
+		android:title="Leáll" >
+		<menu >
+			<item
+				android:id="@+id/mnStopProg"
+				android:title="Vetítő programból kilép" />
+			<item
+				android:id="@+id/mnStopShutdown"
+				android:title="Vetítő gép leáll" />
+		</menu>
+	</item>
+	<item
+        android:id="@+id/mnExit"
+        android:title="Kilép"/>
+</menu>

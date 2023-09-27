@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DiaVetito</string>
+    <string-array name="setrotate">
+		<item>0°</item>
+		<item>90°</item>
+		<item>180°</item>
+		<item>270°</item>
+	</string-array>
+	
+</resources>

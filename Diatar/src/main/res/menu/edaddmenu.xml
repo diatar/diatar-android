@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <item
+        android:id="@+id/mnEdAddDtx"
+        android:title="Új dia énektárból"/>
+    <item
+        android:id="@+id/mnEdAddManual"
+        android:title="Szövegbeírás"/>
+	<item
+        android:id="@+id/mnEdAddSep"
+        android:title="Elválasztó"/>
+	<item
+        android:id="@+id/mnEdAddPic"
+        android:title="Kép"/>
+	
+</menu>

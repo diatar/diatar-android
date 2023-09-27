@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent"
+	android:orientation="horizontal">
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:id="@+id/MainControls2">
+
+		<ScrollView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content">
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="vertical">
+
+				<ImageButton
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@drawable/balranyil2"
+					android:id="@+id/PrevEBtn"
+					android:onClick="onPrevEBtn"
+					android:layout_gravity="center_horizontal"/>
+
+				<ImageButton
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@drawable/balranyil1"
+					android:id="@+id/PrevDBtn"
+					android:onClick="onPrevDBtn"
+					android:layout_gravity="center_horizontal"/>
+
+				<ImageButton
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@drawable/pirosgomb1"
+					android:id="@+id/ShowBtn"
+					android:onClick="onShowBtn"
+					android:layout_gravity="center_vertical"/>
+
+				<ImageButton
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@drawable/jobbranyil1"
+					android:id="@+id/NextDBtn"
+					android:onClick="onNextDBtn"
+					android:layout_gravity="center_horizontal"/>
+
+				<ImageButton
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@drawable/jobbranyil2"
+					android:id="@+id/NextEBtn"
+					android:onClick="onNextEBtn"
+					android:layout_gravity="center_horizontal"/>
+
+				<ImageButton
+					android:src="@drawable/kiemelbalra"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"
+					android:onClick="onPrevHBtn"
+					android:id="@+id/PrevHBtn"/>
+
+				<ImageButton
+					android:src="@drawable/kiemeljobbra"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:layout_gravity="center_horizontal"
+					android:onClick="onNextHBtn"
+					android:id="@+id/NextHBtn"/>
+
+			</LinearLayout>
+
+		</ScrollView>
+
+		<View
+			android:layout_height="match_parent"
+			android:background="?android:attr/dividerHorizontal"
+			android:layout_width="1dp"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="vertical"
+		android:weightSum="1">
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/MainControls1">
+
+			<GridLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				rowCount="1"
+				columnCount="1"
+				android:columnCount="2">
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Énektár:"
+					android:layout_width="wrap_content"
+					android:layout_weight="0"
+					android:layout_column="0"
+					android:layout_row="0"
+					android:layout_gravity="right|center_vertical"/>
+
+				<Spinner
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_weight="1"
+					android:layout_column="1"
+					android:layout_row="0"
+					android:layout_gravity="center_vertical|fill_horizontal"
+					android:id="@+id/DtxLst"
+					android:layout_marginTop="2dp"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Ének:"
+					android:layout_width="wrap_content"
+					android:layout_weight="0"
+					android:layout_gravity="right|center_vertical"
+					android:layout_column="0"
+					android:layout_row="1"/>
+
+				<Spinner
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_weight="1"
+					android:layout_column="1"
+					android:layout_row="1"
+					android:id="@+id/EnekLst"
+					android:layout_gravity="center_vertical|fill_horizontal"
+					android:layout_marginTop="2dp"/>
+
+				<TextView
+					android:layout_height="wrap_content"
+					android:text="Dia:"
+					android:layout_width="wrap_content"
+					android:layout_weight="0"
+					android:layout_row="2"
+					android:layout_column="0"
+					android:layout_gravity="right|center_vertical"/>
+
+				<Spinner
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_weight="1"
+					android:layout_row="2"
+					android:layout_column="1"
+					android:layout_gravity="center_vertical|fill_horizontal"
+					android:id="@+id/DiaLst"
+					android:layout_marginTop="2dp"/>
+
+			</GridLayout>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:id="@+id/mainPgFrame"
+			android:background="#00FF00">
+
+			<LinearLayout
+				android:layout_height="match_parent"
+				android:layout_width="match_parent"
+				android:orientation="horizontal"
+				android:layout_margin="2dp"
+				android:id="@+id/mainPagerBg"
+				android:background="#FFFFFF">
+
+				<androidx.viewpager.widget.ViewPager
+					android:id="@+id/mainPager"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent" />
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+

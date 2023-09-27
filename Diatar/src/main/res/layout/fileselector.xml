@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:text="Text"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:layout_width="match_parent"
+		android:id="@+id/fsDir"
+		android:background="#0000FF"
+		android:textColor="#FFFFFF"/>
+
+	<ListView
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:id="@+id/fsLst"
+		android:layout_weight="1.0"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:id="@+id/fsFnameBox">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:text="Fájlnév:"
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:layout_width="wrap_content"
+				android:layout_gravity="center_vertical"/>
+
+			<EditText
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:id="@+id/fsEdit"
+				android:layout_gravity="center_vertical"
+				android:inputType="text"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarStyle"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:layout_gravity="bottom">
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonBarButtonStyle"
+				android:text="Ok"
+				android:layout_width="wrap_content"
+				android:id="@+id/fsOkBtn"
+				android:layout_weight="1.0"
+				android:onClick="onOkBtn"/>
+
+			<Button
+				android:layout_height="wrap_content"
+				style="?android:attr/buttonBarButtonStyle"
+				android:text="Mégse"
+				android:layout_width="wrap_content"
+				android:id="@+id/fsCancelBtn"
+				android:onClick="onCancel"
+				android:layout_weight="1.0"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+</LinearLayout>
+
