@@ -209,6 +209,19 @@ public class MainActivity extends MainMenu
 			if (ex<0) ex=0;
 		}
 		if (ex>=0 && ex!=EnekIdx) {
+			if (ex>EnekIdx) {
+				while (ex+1<EnekLst.getCount()) {
+					if (!EnekLst.getItemAtPosition(ex).toString().startsWith("-- ")) break;
+					ex++;
+					if (px>=0) px++;
+				}
+			} else {
+				while (ex>0) {
+					if (!EnekLst.getItemAtPosition(ex).toString().startsWith("-- ")) break;
+					ex--;
+					if (px>=0) px--;
+				}
+			}
 			EnekIdx=ex; poschanged=true;
 			if (ex!=EnekLst.getSelectedItemPosition())
 				EnekLst.setSelection(ex);
@@ -520,13 +533,21 @@ public class MainActivity extends MainMenu
 	//////////////////////////////
 	
 	public void onPrevEBtn(View v) {
-		int p=EnekLst.getSelectedItemPosition();
-		if (p>0) EnekLst.setSelection(p-1);
+		int p=EnekLst.getSelectedItemPosition()-1;
+		while (p>=0) {
+			if (!EnekLst.getItemAtPosition(p).toString().startsWith("-- ")) break;
+			p--;
+		}
+		if (p>=0) EnekLst.setSelection(p);
 	}
 	
 	public void onNextEBtn(View v) {
-		int p=EnekLst.getSelectedItemPosition();
-		if (p<EnekLst.getCount()-1) EnekLst.setSelection(p+1);
+		int p=EnekLst.getSelectedItemPosition()+1;
+		while (p<EnekLst.getCount()) {
+			if (!EnekLst.getItemAtPosition(p).toString().startsWith("-- ")) break;
+			p++;
+		}
+		if (p<EnekLst.getCount()) EnekLst.setSelection(p);
 	}
 	
 	public void onPrevDBtn(View v) {
@@ -540,6 +561,10 @@ public class MainActivity extends MainMenu
 			DiaLst.setSelection(p);
 		else {
 			int ex=EnekLst.getSelectedItemPosition()-1;
+			while (ex>=0) {
+				if (!EnekLst.getItemAtPosition(ex).toString().startsWith("-- ")) break;
+				ex--;
+			}
 			if (ex<0) return;
 			EnekIdx=ex;
 			EnekLst.setSelection(ex);
@@ -567,6 +592,10 @@ public class MainActivity extends MainMenu
 			DiaLst.setSelection(p);
 		else {
 			p=EnekLst.getSelectedItemPosition()+1;
+			while (p<EnekLst.getCount()) {
+				if (!EnekLst.getItemAtPosition(p).toString().startsWith("-- ")) break;
+				p++;
+			}
 			if (p>=EnekLst.getCount()) return;
 			EnekLst.setSelection(p);
 			//if (isdbl) DiaLst.setSelection(1);
