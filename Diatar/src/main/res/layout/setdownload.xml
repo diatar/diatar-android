@@ -30,35 +30,12 @@
 		android:onClick="onDownNowBtn"
 		android:layout_gravity="center|center_vertical"/>
 
-	<TextView
-		android:layout_height="wrap_content"
-		android:text="Saját DTX fájlok könyvtára:"
-		android:layout_width="wrap_content"/>
-
-	<LinearLayout
-		android:layout_height="wrap_content"
+	<Button
+		android:id="@+id/setDownImport"
 		android:layout_width="match_parent"
-		android:orientation="horizontal">
-
-		<EditText
-			android:layout_height="wrap_content"
-			android:ems="10"
-			android:layout_width="match_parent"
-			android:id="@+id/setDownDtx2DirEd"
-			android:layout_weight="1.0"
-			android:layout_gravity="left|center_vertical"
-			android:ellipsize="start"/>
-
-		<Button
-			android:layout_height="wrap_content"
-			style="?android:attr/buttonStyleSmall"
-			android:text="..."
-			android:layout_width="wrap_content"
-			android:layout_gravity="right|center_vertical"
-			android:id="@+id/setDownDtx2DirBtn"
-			android:onClick="onDtx2DirBtn"/>
-
-	</LinearLayout>
+		android:layout_height="wrap_content"
+		android:onClick="onImportBtn"
+		android:text="Saját DTX import" />
 
 	<CheckBox
 		android:layout_width="wrap_content"

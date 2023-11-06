@@ -52,12 +52,12 @@ public class MainMenu extends FragmentActivity
 	// feldolgozas
 	////////////////////
 	
-	private final int REQUEST_FILELOAD = 101;
-	private final int REQUEST_LOADING = 102;
-	private final int REQUEST_NETING  = 104;
-	private final int REQUEST_DOWNING  = 105;
-	private final int REQUEST_PROJING  = 106;
-	private final int REQUEST_EDITING  = 107;
+	private static final int REQUEST_FILELOAD = 101;
+	private static final int REQUEST_LOADING = 102;
+	private static final int REQUEST_NETING  = 104;
+	private static final int REQUEST_DOWNING  = 105;
+	private static final int REQUEST_PROJING  = 106;
+	private static final int REQUEST_EDITING  = 107;
 	
 	private void doMenuLoad() {
 		if (G.OPEN_DIA_BY_FILESELECTOR) {
@@ -116,13 +116,15 @@ public class MainMenu extends FragmentActivity
 			if (data != null) {
 				G.sLoadUri = data.getData();
 				String fname = "???";
-				Cursor cr = getContentResolver().query(G.sLoadUri,null,null,null,null,null);
+				Cursor cr = null;
+				cr = getContentResolver().query(G.sLoadUri,null,null,null,null,null);
 				try {
 					if (cr!=null && cr.moveToFirst()) {
-						fname = cr.getString(cr.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+						int idx = cr.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+						if (idx>=0) fname = cr.getString(idx);
 					}
 				} finally {
-					cr.close();
+					if (cr != null) cr.close();
 				}
 				whenLoadSelected(null, fname);
 			}

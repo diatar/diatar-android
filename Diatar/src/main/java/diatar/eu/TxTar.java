@@ -18,7 +18,7 @@ public class TxTar {
 	public static int CurrKotet;
 	private int _order;
 	private String _rovidnev, _csopnev;
-	public static String progdir, docdir, appspecdir;
+	public static String progdir, docdir, appspecdir, privatedir;
 	
 	private TxTar(Context ctx) { LoadNames(ctx); }
 
@@ -32,14 +32,9 @@ public class TxTar {
 	public static TxTar Create(Context ctx) {
 		if (instance==null) {
 			progdir=ctx.getFilesDir().getAbsolutePath();
-			//{
-			//	File d = new File(progdir);
-			//	String flist[] = d.list();
-			//	for (String fn : flist) {
-			//		File fle = new File(d,fn);
-			//		fle.delete();
-			//	}
-			//}
+			File fp = new File(progdir,"private");
+			fp.mkdir();
+			privatedir=fp.toString();
 			File f = new File(
 				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
 				, "diatar/"
@@ -121,8 +116,9 @@ public class TxTar {
 /////////////////////
 
 	public String getDtx2Dir() {
-		if (G.sDtx2Dir.isEmpty()) return docdir;
-		return G.sDtx2Dir;
+		return privatedir;
+		//if (G.sDtx2Dir.isEmpty()) return docdir;
+		//return G.sDtx2Dir;
 	}
 	
 	public void LoadNames(Context ctx) {
