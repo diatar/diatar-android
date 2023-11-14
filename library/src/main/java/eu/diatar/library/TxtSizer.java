@@ -1,18 +1,17 @@
 package eu.diatar.library;
-import java.util.*;
 import android.graphics.*;
-//import org.apache.http.impl.bootstrap.*;
 import android.util.*;
 import android.content.*;
 import android.content.res.*;
 
 public class TxtSizer
 {
-	private Lines mLines;
+	private final Lines mLines;
 	public boolean needrecalc;
 	private float mFontSize, mTitleSize;
 	private float yadd;  //for VCenter
-	private float wsp, why, scrw, scrh, yspacing;
+	private float wsp, why;		//space width, hyphen width
+	private float scrw, scrh, yspacing;		//screen size, extra space between rows
 	
 	static private float sDensity;
 	
@@ -218,7 +217,7 @@ public class TxtSizer
 					Paint pa = new Paint(p);
 					pa.setTextSize((p.getTextSize()*gAkkordArany)/100f);
 					w.akkord.Draw(canvas,pa,xt,y-(pa.descent()-p.ascent()));
-					if (w.endtype==w.etCONT) {
+					if (w.endtype==Word.etCONT) {
 						float tw = p.measureText(w.txt);
 						if (tw<w.width) canvas.drawLine(x0+tw,y,x0+w.width,y,p);
 					}
@@ -283,7 +282,7 @@ public class TxtSizer
 		for (int i=0; i<mLines.mData.size(); i++) {
 			y=RecalcLine(i,y);
 			if (logging)
-				Log.d("Recalc",Integer.toString(i)+". "+Float.toString(y));
+				Log.d("Recalc",i+". "+y);
 		}
 		return y;
 	}
@@ -294,7 +293,7 @@ public class TxtSizer
 	
 	private Line jLN;
 	private int jNBrk, jN;
-	private boolean jBrks[];
+	private boolean[] jBrks;
 	
 	//true = elfogadhato a tordeles
 	private boolean TryBreaks(int level, int pos) {
@@ -398,7 +397,7 @@ public class TxtSizer
 		RecalcScreen(true);
 		RecalcBreaks();
 		needrecalc=false;
-		Log.d("Draw","TxtSizer.Recalc finished H="+((Float)ytotal).toString());
+		Log.d("Draw","TxtSizer.Recalc finished H="+((Float)ytotal));
 	}
 	
 	//return: total height
@@ -429,7 +428,7 @@ public class TxtSizer
 		for (int i=0; i<mLines.mData.size(); i++) {
 			mKotta.reset();
 			y=DrawLine(i,canvas,y);
-			Log.d("Draw",Integer.toString(i)+". "+Float.toString(y));
+			Log.d("Draw",i+". "+y);
 		}
 		return y;
 	}
@@ -439,7 +438,7 @@ public class TxtSizer
 		scrw=scrwidth; scrh=scrheight;
 		if (needrecalc) Recalc();
 		float ytotal=DrawScreen(canvas);
-		Log.d("Draw","TxtSizer.Draw finished H="+((Float)ytotal).toString());
+		Log.d("Draw","TxtSizer.Draw finished H="+((Float)ytotal));
 	}
 
 }

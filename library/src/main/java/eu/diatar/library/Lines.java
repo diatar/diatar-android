@@ -1,15 +1,13 @@
 package eu.diatar.library;
 
-//import java.util.*;
 import android.graphics.*;
-//import org.apache.http.ssl.*;
-import android.provider.*;
 import java.util.*;
 
 class FontStyle {
 	private static final byte fsBOLD = 1;
 	private static final byte fsUNDERLINE = 2;
 	private static final byte fsITALIC = 4;
+	private static final byte fsSTRIKE = 8;
 	
 	private static final byte fsARC = 16;
 	private static final byte fsABEGIN = 32;
@@ -21,14 +19,9 @@ class FontStyle {
 		mStyle=0;
 		mColor=0;
 	}
-	
-	public FontStyle(boolean bd, boolean ul, boolean it) {
-		set(bd,ul,it);
-		mColor=0;
-	}
-	
+
 	public FontStyle(FontStyle src) {
-		set(src.getBold(), src.getUnderline(), src.getItalic());
+		set(src.getBold(), src.getUnderline(), src.getItalic(), src.getStrike());
 		setColor(src.getColor());
 		setABegin(src.getABegin());
 		setArc(src.getArc());
@@ -37,17 +30,19 @@ class FontStyle {
 	public boolean getBold() { return (mStyle&fsBOLD)!=0; }
 	public boolean getUnderline() { return (mStyle&fsUNDERLINE)!=0; }
 	public boolean getItalic() { return (mStyle&fsITALIC)!=0; }
+	public boolean getStrike() { return (mStyle&fsSTRIKE)!=0; }
 	public void setBold(boolean newval) {
 		if (newval) mStyle|=fsBOLD; else mStyle&=~fsBOLD;
 	}
-	public void setUndeline(boolean newval) {
-		if (newval) mStyle|=fsUNDERLINE; else mStyle&=~fsUNDERLINE;
-	}
+	public void setUndeline(boolean newval) { if (newval) mStyle|=fsUNDERLINE; else mStyle&=~fsUNDERLINE; }
 	public void setItalic(boolean newval) {
 		if (newval) mStyle|=fsITALIC; else mStyle&=~fsITALIC;
 	}
-	public void set(boolean bd, boolean ul, boolean it) {
-		setBold(bd); setUndeline(ul); setItalic(it);
+	public void setStrike(boolean newval) {
+		if (newval) mStyle|=fsSTRIKE; else mStyle&=~fsSTRIKE;
+	}
+	public void set(boolean bd, boolean ul, boolean it, boolean st) {
+		setBold(bd); setUndeline(ul); setItalic(it); setStrike(st);
 	}
 	
 	public boolean getABegin() { return (mStyle&fsABEGIN)!=0; }
@@ -97,7 +92,7 @@ class Word {
 	public String kotta;
 	public float keloW;  //kotta elojegyzes
 	
-	private static Paint pcache[] = new Paint[8];
+	private static final Paint[] pcache = new Paint[8];
 	private static float psize = 0f;
 
 	public Word(String aTxt,
@@ -123,6 +118,10 @@ class Word {
 		if (pcache[idx]!=null) {
 			Paint p=pcache[idx];
 			p.setColor(fcolor);
+			if (style.getStrike())
+				p.setFlags(p.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+			else
+				p.setFlags(p.getFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 			return p;
 		}
 		Paint p = new Paint();
@@ -135,12 +134,16 @@ class Word {
 		p.setTypeface(tf);
 		p.setUnderlineText(style.getUnderline());
 		pcache[idx]=p;
+		if (style.getStrike())
+			p.setFlags(p.getFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+		else
+			p.setFlags(p.getFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
 		return p;
 	}
 }
 
 class WordGroup {
-	public ArrayList<Word> mData = new ArrayList<Word>();
+	public ArrayList<Word> mData = new ArrayList<>();
 	public float width;
 	public char endtype;
 	public boolean brk;
@@ -159,16 +162,16 @@ class WordGroup {
 }
 
 class Line {
-	public ArrayList<WordGroup> mData = new ArrayList<WordGroup>();
+	public ArrayList<WordGroup> mData = new ArrayList<>();
 	public boolean mHasBrk;
 }
 
 public class Lines {
-	public ArrayList<Line> mData = new ArrayList<Line>(); 
+	public ArrayList<Line> mData = new ArrayList<>();
 	public boolean mHasAkkord;
 	public boolean mHasKotta;
 	
-	private class AkkordFactory {
+	private static class AkkordFactory {
 		private Akkord a;
 		
 		public void add(String s) {
@@ -180,15 +183,13 @@ public class Lines {
 			a=null;
 			return res;
 		}
-		
-		public boolean has() { return a!=null; }
 	}
 	
-	private class KottaFactory {
+	private static class KottaFactory {
 		private String k;
 
 		public void add(String s) {
-			k = new String(s);
+			k = s;
 		}
 
 		public String get() {
@@ -196,11 +197,9 @@ public class Lines {
 			k=null;
 			return res;
 		}
-		
-		public boolean has() { return k!=null; }
 	}
 	
-	private class WordFactory {
+	private static class WordFactory {
 		private WordGroup wg;
 		
 		public void add(String aTxt,
@@ -219,8 +218,6 @@ public class Lines {
 			wg=null;
 			return res;
 		}
-		
-		public boolean has() { return wg!=null; }
 	}
 	
 	//ret: word count
@@ -245,7 +242,9 @@ public class Lines {
 				if (ch=='U') { fs.setUndeline(true); bui=true; } else
 				if (ch=='u') { fs.setUndeline(false); bui=true; } else
 				if (ch=='I') { fs.setItalic(true); bui=true; } else
-				if (ch=='i') { fs.setItalic(false); bui=true; }
+				if (ch=='i') { fs.setItalic(false); bui=true; } else
+				if (ch=='S') { fs.setStrike(true); bui=true; } else
+				if (ch=='s') { fs.setStrike(false); bui=true; }
 				if (bui) {
 					if (i>p0+2) {
 						wf.add(src.substring(p0,i-2),ofs,Word.etCONT,af.get(),kf.get());
@@ -318,7 +317,7 @@ public class Lines {
 				dst.mData.add(wf.get());
 				p0=i;
 				wcnt++;
-				continue;
+				//continue;
 			}
 		}//for
 		wf.add(src.substring(p0),fs,Word.etEOL,af.get(),kf.get());
