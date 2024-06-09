@@ -41,6 +41,7 @@ public class G  //globals
 	public static final String idUSEAKKORD = "UseAkkord";
 	public static final String idUSEKOTTA = "UseKotta";
 	public static final String idUSETITLE = "UseTitle";
+	public static final String idCIM = "cim";
 	public static final String idTXT = "txt";
 	public static final String idSEL = "sel";
 	public static final String idFTYPE = "FileType";

@@ -99,6 +99,8 @@ public class EditActivity extends Activity
 			startActivityForResult(it,REQUEST_ADD_DTX);
 			return true;
 		case R.id.mnEdAddManual:
+			it = new Intent(this, EdManualText.class);
+			startActivityForResult(it,REQUEST_ADD_MANUAL);
 			return true;
 		case R.id.mnEdAddSep:
 			it = new Intent(this, EdSep.class);
@@ -143,8 +145,10 @@ public class EditActivity extends Activity
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode==REQUEST_ADD_SEP) reqAddSep(resultCode, data);
 		if (requestCode==REQUEST_ADD_DTX) reqAddDtx(resultCode, data);
+		if (requestCode==REQUEST_ADD_MANUAL) reqAddManual(resultCode, data);
 		if (requestCode==REQUEST_ADD_PIC) reqAddPic(resultCode, data);
 		if (requestCode==REQUEST_ED_DTX) reqEdDtx(resultCode, data);
+		if (requestCode==REQUEST_ED_MANUAL) reqEdManual(resultCode, data);
 		if (requestCode==REQUEST_ED_SEP) reqEdSep(resultCode, data);
 		if (requestCode==REQUEST_ED_PIC) reqEdPic(resultCode, data);
 		if (requestCode==REQUEST_FILESAVE) reqFilesave(resultCode, data);
@@ -256,6 +260,32 @@ public class EditActivity extends Activity
 		G.sPicDir=dn;
 		G.Save(this);
 	}
+
+	private void reqAddManual(int resultCode, Intent data) {
+		if (resultCode!=RESULT_OK) return;
+		String cim = data.getStringExtra(G.idCIM);
+		String txt = data.getStringExtra(G.idTXT);
+		if (cim==null||txt==null) return;
+		DiaItem dact = DiaItem.getByPos(actitem);
+		DiaItem dnew = new DiaItem(DiaItem.ditTXT);
+		dnew.mKnev=cim;
+		dnew.mTxt=txt.split("\n");
+		dnew.InsertMe(dact);
+		mLstAdapter.notifyDataSetChanged();
+		mLst.invalidate();
+	}
+
+	private void reqEdManual(int resultCode, Intent data) {
+		if (resultCode!=RESULT_OK) return;
+		DiaItem d = DiaItem.getByPos(actitem);
+		if (d==null) return;
+		String cim = data.getStringExtra(G.idCIM);
+		String txt = data.getStringExtra(G.idTXT);
+		if (cim==null||txt==null) return;
+		d.mKnev=cim;
+		d.mTxt=txt.split("\n");
+		mLstAdapter.notifyDataSetChanged();
+	}
 	
 	private void reqFilesave(int resultCode, Intent data) {
 		if (resultCode!=RESULT_OK) return;
@@ -298,7 +328,6 @@ public class EditActivity extends Activity
 		PopupMenu pm = new PopupMenu(this,v);
 		pm.inflate(R.menu.edaddmenu);
 		pm.setOnMenuItemClickListener(this);
-		pm.getMenu().findItem(R.id.mnEdAddManual).setVisible(false);
 		pm.show();
 		return true;
 	}
@@ -330,6 +359,13 @@ public class EditActivity extends Activity
 			it.putExtra(G.idFNAME,d.mVnev);
 			it.putExtra(G.idINDEX,p);
 			startActivityForResult(it,REQUEST_ED_PIC);
+			return;
+		}
+		if (d.mTipus== DiaItem.ditTXT) {
+			Intent it = new Intent(this,EdManualText.class);
+			it.putExtra(G.idCIM,d.mKnev);
+			it.putExtra(G.idTXT,String.join("\n",d.mTxt));
+			startActivityForResult(it,REQUEST_ED_MANUAL);
 			return;
 		}
 	}

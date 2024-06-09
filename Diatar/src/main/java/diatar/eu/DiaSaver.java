@@ -31,9 +31,10 @@ public class DiaSaver
 						+SaveProp(d.mProps);
 					if (!s.isEmpty()) return s;
 				} else if (d.mTipus==d.ditTXT) {
+					bw.write("caption="+d.mKnev+"\n");
 					bw.write("lines="+d.mTxt.length+"\n");
 					for (int i=0; i<d.mTxt.length; i++) {
-						bw.write("line"+(i+1)+"="+d.mTxt[i]+"\n");
+						bw.write("line"+i+"="+d.mTxt[i]+"\n");
 						String s=SaveProp(d.mProps);
 						if (!s.isEmpty()) return s;
 					}
