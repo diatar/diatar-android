@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:labelFor="@id/edManualTextCim"
+			android:text="Cím:" />
+
+		<EditText
+			android:id="@+id/edManualTextCim"
+			android:layout_width="0dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:ems="10"
+			android:inputType="text" />
+	</LinearLayout>
+
+	<EditText
+		android:id="@+id/edManualTextSzoveg"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:gravity="start|top"
+		android:hint="Dia szövege..."
+		android:inputType="text|textAutoCorrect|textMultiLine"
+		android:lines="5"
+		android:singleLine="false" />
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		style="?android:attr/buttonBarStyle"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Mégse"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onCancel"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			style="?android:attr/buttonBarButtonStyle"
+			android:text="Ok"
+			android:layout_width="wrap_content"
+			android:layout_weight="1.0"
+			android:onClick="onOk"/>
+
+	</LinearLayout>
+
+</LinearLayout>
+

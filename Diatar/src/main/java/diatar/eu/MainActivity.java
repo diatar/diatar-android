@@ -274,9 +274,12 @@ public class MainActivity extends MainMenu
 		} else {
 			String title="";
 			String arr[]=null;
-			if (d==null || d.mTipus==d.ditDTX || d.mTipus==d.ditTXT) {
-				title=Dtx.getDiaTitle(this,kx-1,ex,vx);
-				arr=getDiaTxt(PageIdx);
+			if (d == null || d.mTipus == DiaItem.ditDTX) {
+				title = Dtx.getDiaTitle(this, kx - 1, ex, vx);
+				arr = getDiaTxt(PageIdx);
+			} else if (d.mTipus == DiaItem.ditTXT) {
+				title = d.getDiaTitle(false);
+				arr = getDiaTxt(PageIdx);
 			}
 			RecText rt = RecText.Create(title,arr);
 			rec=rt; rtyp=RecHdr.itText;
