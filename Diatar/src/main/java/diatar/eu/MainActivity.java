@@ -1,19 +1,14 @@
 package diatar.eu;
 
 import android.app.ActionBar;
-import android.content.pm.PackageManager;
 import android.os.*;
-import android.util.Log;
 import android.widget.*;
 import android.view.*;
 import android.widget.AdapterView.*;
 import android.graphics.drawable.*;
 import java.util.*;
-import android.*;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -40,19 +35,15 @@ public class MainActivity extends MainMenu
 	private int DtxIdx=-2, EnekIdx=-2, DiaIdx=-2, PageIdx=-2;
 	private int mCurrDtx; //0=dia v semmi
 	
-	private class tGroup {
+	private static class tGroup {
 		String Name;
 		ArrayList<Integer> DtxLst;
-	};
+	}
 	private ArrayList<tGroup> mGrpLst;
 
-	private static final String ArrowR = "\u25B7";
-	private static final String ArrowD = "\u25BD";
-	
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 		G.Load(this);
 		Dtx = TxTar.Create(this);
 		mTcp = TcpClient.get(this);
@@ -134,7 +125,7 @@ public class MainActivity extends MainMenu
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState)
+	protected void onSaveInstanceState(@NonNull Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
 		saveState(outState);
@@ -166,7 +157,8 @@ public class MainActivity extends MainMenu
 	}
 
 	public void ConnectInternet(boolean verbose) {
-		final DownloadDtxList ddl = new DownloadDtxList(this, verbose) {
+		final DownloadDtxList ddl;
+		ddl = new DownloadDtxList(this, verbose) {
 			@Override
 			public void Finished() {
 				SelectForDownload sfd = new SelectForDownload(MainActivity.this, this);
@@ -264,7 +256,7 @@ public class MainActivity extends MainMenu
 		} //else if (G.sDiaFname.length()>0) kx--;
 		RecBase rec;
 		byte rtyp;
-		if (d!=null && d.mTipus==d.ditPIC) {
+		if (d!=null && d.mTipus==DiaItem.ditPIC) {
 			File f = new File(d.mKnev,d.mVnev);
 			RecPic rp = new RecPic(8+(int)f.length());
 			rp.setLen(rp.getMaxlen());
@@ -272,13 +264,14 @@ public class MainActivity extends MainMenu
 			ext=ext.substring(ext.lastIndexOf('.')+1);
 			rp.setExt(ext);
 			try {
-				FileInputStream fis = new FileInputStream(f);
-				fis.read(rp.buf,8,(int)f.length());
+				try (FileInputStream fis = new FileInputStream(f)) {
+					fis.read(rp.buf, 8, (int) f.length());
+				}
 			} catch(Exception e) { }
 			rec=rp; rtyp=RecHdr.itPic;
 		} else {
 			String title="";
-			String arr[]=null;
+			String[] arr=null;
 			if (d == null || d.mTipus == DiaItem.ditDTX) {
 				title = Dtx.getDiaTitle(this, kx - 1, ex, vx);
 				arr = getDiaTxt(PageIdx);
@@ -286,8 +279,8 @@ public class MainActivity extends MainMenu
 				title = d.getDiaTitle(false);
 				arr = getDiaTxt(PageIdx);
 			}
-			RecText rt = RecText.Create(title,arr);
-			rec=rt; rtyp=RecHdr.itText;
+			rec = RecText.Create(title,arr);
+			rtyp=RecHdr.itText;
 		}
 		G.sHighPos=0;
 		DiaItem.setupRecState(d,mTcp.mStateToSend);
@@ -347,10 +340,10 @@ public class MainActivity extends MainMenu
 	public void FillGrpLst() {
 		String[] narr = Dtx.getNames();
 		String[] garr = Dtx.getGrpNames();
-		mGrpLst = new ArrayList<tGroup>();
+		mGrpLst = new ArrayList<>();
 		tGroup egrp = new tGroup();
 		egrp.Name="(nem besorolt)";
-		egrp.DtxLst = new ArrayList<Integer>();
+		egrp.DtxLst = new ArrayList<>();
 		for (int i=0; i<narr.length; i++) {
 			String gnam = garr[i];
 			if (gnam.isEmpty()) {
@@ -368,7 +361,7 @@ public class MainActivity extends MainMenu
 			if (found) continue;
 			tGroup grp = new tGroup();
 			grp.Name=gnam;
-			grp.DtxLst = new ArrayList<Integer>();
+			grp.DtxLst = new ArrayList<>();
 			grp.DtxLst.add(i);
 			mGrpLst.add(grp);
 		}
@@ -382,7 +375,7 @@ public class MainActivity extends MainMenu
 	}
 	
 	public void Reload(int px, int pe, int pd) {
-		ArrayList<String> xlst = new ArrayList<String>();
+		ArrayList<String> xlst = new ArrayList<>();
 		if (G.sDiaFname.length()>0) xlst.add("DIA: "+G.sDiaFname);
 		String[] xarr = Dtx.getNames();
 		for (tGroup g : mGrpLst) {
@@ -391,7 +384,7 @@ public class MainActivity extends MainMenu
 				xlst.add("    "+xarr[ix]);
 		}
 		//if (xlst.
-		ArrayAdapter<String> adp = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,xlst);
+		ArrayAdapter<String> adp = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,xlst);
 		DtxLst.setAdapter(adp);
 		DtxIdx=-2; PageIdx=-2;
 		SetAllIdx(px,pe,pd,-1);
@@ -403,7 +396,7 @@ public class MainActivity extends MainMenu
 			arr=DiaItem.getEnekLst();
 		if (DtxIndex>0) DtxIndex--;
 		if (arr==null) arr=Dtx.getEnekLst(this,DtxIndex);
-		ArrayAdapter<String> lst = new ArrayAdapter<String>(this,
+		ArrayAdapter<String> lst = new ArrayAdapter<>(this,
 			android.R.layout.simple_spinner_item,
 			arr);
 		EnekLst.setAdapter(lst);
@@ -416,7 +409,7 @@ public class MainActivity extends MainMenu
 			arr=DiaItem.getVersszakLst(EnekIndex);
 		if (DtxIndex>0) DtxIndex--;
 		if (arr==null) arr=Dtx.getVersszakLst(this,DtxIndex,EnekIndex);
-		ArrayAdapter<String> lst = new ArrayAdapter<String>(this,
+		ArrayAdapter<String> lst = new ArrayAdapter<>(this,
 			android.R.layout.simple_spinner_item,
 			arr);
 		DiaLst.setAdapter(lst);
@@ -491,7 +484,7 @@ public class MainActivity extends MainMenu
 				// Remember that you should never show the action bar if the
 				// status bar is hidden, so hide that too if necessary.
 				ActionBar actionBar = getActionBar();
-				actionBar.hide();
+				if (actionBar!=null) actionBar.hide();
 			}
 		} else {
 			mMainCtrl1.setVisibility(View.VISIBLE);
@@ -512,7 +505,7 @@ public class MainActivity extends MainMenu
 // Remember that you should never show the action bar if the
 // status bar is hidden, so hide that too if necessary.
 				ActionBar actionBar = getActionBar();
-				actionBar.show();
+				if (actionBar!=null) actionBar.show();
 			}
 		}
 	}
@@ -521,11 +514,11 @@ public class MainActivity extends MainMenu
 	//////////////////////////////
 	
 	public void Msg(String txt) {
-		Dtx.Msg(this,txt);
+		TxTar.Msg(this,txt);
 	}
 	
 	public void Err(String txt) {
-		Dtx.Msg(this,txt);
+		TxTar.Msg(this,txt);
 	}
 	
 	public void flipShowState() {
@@ -590,11 +583,9 @@ public class MainActivity extends MainMenu
 	
 	public void onNextDBtn(View v) {
 		int p=DiaLst.getSelectedItemPosition()+1, n=DiaLst.getCount();
-		boolean isdbl=false;
 		if (isDia(-1)) {
 			DiaItem d = DiaItem.getByIndex(EnekLst.getSelectedItemPosition(), p-1);
 			if (d!=null && d.mProps.mDblDia) p++;
-			isdbl=(p>n);
 		}
 		if (p<n)
 			DiaLst.setSelection(p);
@@ -606,7 +597,6 @@ public class MainActivity extends MainMenu
 			}
 			if (p>=EnekLst.getCount()) return;
 			EnekLst.setSelection(p);
-			//if (isdbl) DiaLst.setSelection(1);
 		}
 	}
 	
@@ -645,16 +635,16 @@ public class MainActivity extends MainMenu
 	///////////////////////////////
 	///////////////////////////////
 	
-	public void OnTcpConnect() {
-		mTcp.fillState();
-		sendNetCurrDia();
-		sendNetBlank();
-		mTcp.setStateProjecting(G.sShowing);
-	}
-	
+//	public void OnTcpConnect() {
+//		mTcp.fillState();
+//		sendNetCurrDia();
+//		sendNetBlank();
+//		mTcp.setStateProjecting(G.sShowing);
+//	}
+
 	///////////////////////////////
 	///////////////////////////////
-	
+
 	//@Override
 	//protected void onMenuEdit() {
 	//	
@@ -696,7 +686,6 @@ public class MainActivity extends MainMenu
 		}
 		ReloadAll();
 		MPAdapter.notifyDataSetChanged();
-		return;
 	}
 	
 	@Override
@@ -763,7 +752,7 @@ public class MainActivity extends MainMenu
 	// MainPagerAdapter
 	//////////////////////
 	
-	private class MainPagerAdapter extends FragmentPagerAdapter {
+	private static class MainPagerAdapter extends FragmentPagerAdapter {
 		public MainSlideFragment mCurrFragment;
 		
 		private int Cnt;
@@ -785,12 +774,12 @@ public class MainActivity extends MainMenu
 		}
 
 		@Override
-		public int getItemPosition(Object object) {
+		public int getItemPosition(@NonNull Object object) {
 			return POSITION_NONE;
 		}
 		
 		@Override
-		public void setPrimaryItem(ViewGroup vg, int pos, Object obj) {
+		public void setPrimaryItem(@NonNull ViewGroup vg, int pos, @NonNull Object obj) {
 			mCurrFragment=(MainSlideFragment)obj;
 			if (mCurrFragment!=null && mCurrFragment.getView() instanceof MainTxtView) {
 				MainTxtView v = (MainTxtView)mCurrFragment.getView();

@@ -4,15 +4,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.util.proto.ProtoOutputStream;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 import diatar.eu.TxTar;
 
@@ -20,9 +17,9 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
 
     public DtxParams[] fparams = null;
 
-    private boolean mVerbose;
+    private final boolean mVerbose;
     private ProgressDialog mDlg;
-    private Context mCtx;
+    private final Context mCtx;
 
     public DownloadDtxList(Context ctx, boolean verbose) {
         mCtx = ctx;
@@ -52,7 +49,7 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
             URLConnection conection = url.openConnection();
             conection.connect();
             InputStream input = new BufferedInputStream(url.openStream(), 8192);
-            byte data[] = new byte[1024];
+            byte[] data = new byte[1024];
 
             int count;
             while ((count = input.read(data)) != -1) {
@@ -71,7 +68,7 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
             return null;
         }
 
-        ArrayList<DtxParams> fp = new ArrayList<DtxParams>();
+        ArrayList<DtxParams> fp = new ArrayList<>();
 
         //feldolgozas
         int p1=0, len = sb.length();
@@ -166,9 +163,9 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
         TxTar Dtx = TxTar.Get();
         if (mVerbose) {
             mDlg.dismiss();
-            Dtx.OkBox(mCtx, values[0], "Internet");
+            TxTar.OkBox(mCtx, values[0], "Internet");
         } else
-            Dtx.Msg(mCtx, values[0], 5000);
+            TxTar.Msg(mCtx, values[0], 5000);
     }
 
     public abstract void Finished();

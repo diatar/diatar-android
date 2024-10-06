@@ -82,11 +82,11 @@ public class SelectForDownload {
         int cnt=0;
         for (int i=1; i<mChk.length; i++) if (mChk[i]) cnt++;
         if (cnt<=0) {
-            TxTar.Get().OkBox(mCtx,"Nem maradt letöltendő!","Internet");
+            TxTar.OkBox(mCtx,"Nem maradt letöltendő!","Internet");
             return;
         }
         DownloadFiles df = new DownloadFiles(mCtx);
-        df.fnames = new ArrayList<String>(); df.fdates = new ArrayList<String>();
+        df.fnames = new ArrayList<>(); df.fdates = new ArrayList<>();
         for (int i=1; i<mChk.length; i++) {
             if (!mChk[i]) continue;
             df.fnames.add(mDtxLst.fparams[i-1].fname());
