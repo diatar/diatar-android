@@ -166,9 +166,14 @@ public class MainActivity extends MainMenu
 	}
 
 	public void ConnectInternet(boolean verbose) {
-		DownloadUrl du = new DownloadUrl(this);
-		du.verbose=verbose;
-		du.execute();
+		final DownloadDtxList ddl = new DownloadDtxList(this, verbose) {
+			@Override
+			public void Finished() {
+				SelectForDownload sfd = new SelectForDownload(MainActivity.this, this);
+				sfd.Run();
+			}
+		};
+		ddl.execute();
 	}
 	
 	public void EndNetRefresh() {
