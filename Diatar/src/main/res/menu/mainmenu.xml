@@ -18,6 +18,11 @@
 				android:id="@+id/mnSetDownload"
 				android:title="Program..."/>
 			<item
+				android:id="@+id/mnSetDtx"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:title="Énektárak..." />
+			<item
 				android:id="@+id/mnSetNet"
 				android:title="Hálózat..."/>
 			<item

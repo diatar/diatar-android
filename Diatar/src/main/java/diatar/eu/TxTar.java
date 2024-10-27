@@ -128,8 +128,8 @@ public class TxTar {
 		ArrayList<String> clst = new ArrayList<String>();
 		ArrayList<Integer> sor = new ArrayList<Integer>();
 
-		ProgressDialog dlg=null;
-		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Betöltés...","",true);
+		ProgressDialog dlg=ProgressDialog.show(ctx,"Betöltés...","",true);
+		SharedPreferences sp = ctx.getSharedPreferences("dtxs", Context.MODE_PRIVATE);
 		for (int pass=1; pass<=2; pass++) {
 			try {
 				File dir = new File(pass==1 ? progdir : getDtx2Dir());
@@ -139,6 +139,7 @@ public class TxTar {
 					//File f = new File(fname); f.delete();
 					//fname="";
 					if (fname.endsWith(".dtx")) {
+						if (sp.getString(fname, "").equals("X")) continue;
 						if (dlg!=null) dlg.setMessage(fname);
 						flst.add(fname);
 						dlst.add(getDtxName(new File(dir,fname)));
@@ -148,7 +149,7 @@ public class TxTar {
 					}
 				}
 			} catch (Exception e) {
-				if (ctx!=null) Msg(ctx,"Err: "+e.getLocalizedMessage());
+				Msg(ctx,"Err: "+e.getLocalizedMessage());
 			}
 		}
 		
@@ -164,19 +165,12 @@ public class TxTar {
 				if (pv>v || (pv==v && ps.compareTo(vs)>0)) { p=i; pv=v; ps=vs; }
 			}
 			if (p>pdest) {
-				sor.set(p,sor.get(pdest));
-				  sor.set(pdest,pv);
-				dlst.set(p,dlst.get(pdest));
-				  dlst.set(pdest,ps);
-				String xs=flst.get(pdest);
-				  flst.set(pdest,flst.get(p));
-				  flst.set(p,xs);
-				xs=rlst.get(pdest);
-				  rlst.set(pdest,rlst.get(p));
-				  rlst.set(p,xs);
-				xs=clst.get(pdest);
-				  clst.set(pdest,clst.get(p));
-				  clst.set(p,xs);
+				sor.set(p,sor.get(pdest)); sor.set(pdest,pv);
+				dlst.set(p,dlst.get(pdest)); dlst.set(pdest,ps);
+				String xs;
+				xs=flst.get(pdest); flst.set(pdest,flst.get(p)); flst.set(p,xs);
+				xs=rlst.get(pdest); rlst.set(pdest,rlst.get(p)); rlst.set(p,xs);
+				xs=clst.get(pdest); clst.set(pdest,clst.get(p)); clst.set(p,xs);
 			}
 		}
 		if (n<=0) {
@@ -197,7 +191,7 @@ public class TxTar {
 		clst.toArray(cnames);
 	}
 	
-	private String getDtxName(File f) throws IOException {
+	public String getDtxName(File f) throws IOException {
 		FileInputStream fis = new FileInputStream(f);
 		BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
 		_order=0;

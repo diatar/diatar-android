@@ -20,6 +20,7 @@ public class MainMenu extends FragmentActivity
 	protected void onMenuSetDownload() { doMenuDown(); }
 	protected void onMenuSetNet() { doMenuNet(); }
 	protected void onMenuSetProject() { doMenuProj(); }
+	protected void onMenuSetDtx() { doMenuDtx(); }
 	protected void onMenuSetAbout() { doMenuAbout(); }
 	protected void onMenuStopProg() {}
 	protected void onMenuStopShutdown() {}
@@ -47,6 +48,8 @@ public class MainMenu extends FragmentActivity
 	protected void whenSetProjed() {}
 	
 	protected void whenEdited() {}
+
+	protected void whenSetDtxed(Intent data) {}
 	
 	////////////////////
 	// feldolgozas
@@ -58,6 +61,7 @@ public class MainMenu extends FragmentActivity
 	private static final int REQUEST_DOWNING  = 105;
 	private static final int REQUEST_PROJING  = 106;
 	private static final int REQUEST_EDITING  = 107;
+	private static final int REQUEST_DTXING = 108;
 	
 	private void doMenuLoad() {
 		if (G.OPEN_DIA_BY_FILESELECTOR) {
@@ -82,6 +86,11 @@ public class MainMenu extends FragmentActivity
 	private void doMenuNet() {
 		Intent it = new Intent(this,SetNet.class);
 		startActivityForResult(it,REQUEST_NETING);
+	}
+
+	private void doMenuDtx() {
+		Intent it = new Intent(this,SetDtx.class);
+		startActivityForResult(it,REQUEST_DTXING);
 	}
 	
 	private void doMenuDown() {
@@ -148,6 +157,10 @@ public class MainMenu extends FragmentActivity
 	private void reqProjing(int resultCode, Intent data) {
 		if (resultCode==RESULT_OK) whenSetProjed();
 	}
+
+	private void reqDtxing(int resultCode, Intent data) {
+		if (resultCode==RESULT_OK && data!=null) whenSetDtxed(data);
+	}
 	
 	private void reqEditing(int resultCode, Intent data) {
 		whenEdited();
@@ -191,6 +204,9 @@ public class MainMenu extends FragmentActivity
 			case R.id.mnSetProject:
 				onMenuSetProject();
 				return true;
+			case R.id.mnSetDtx:
+				onMenuSetDtx();
+				return true;
 			case R.id.mnSetAbout:
 				onMenuSetAbout();
 				return true;
@@ -217,5 +233,6 @@ public class MainMenu extends FragmentActivity
 		if (requestCode==REQUEST_DOWNING) reqDowning(resultCode,data);
 		if (requestCode==REQUEST_PROJING) reqProjing(resultCode,data);
 		if (requestCode==REQUEST_EDITING) reqEditing(resultCode,data);
+		if (requestCode==REQUEST_DTXING) reqDtxing(resultCode,data);
 	}
 }

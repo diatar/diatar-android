@@ -1,6 +1,7 @@
 package diatar.eu;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.*;
 import android.widget.*;
 import android.view.*;
@@ -729,6 +730,22 @@ public class MainActivity extends MainMenu
 		}
 		//ReloadAll();
 		Reload(ix,0,0);
+	}
+
+	@Override
+	protected void whenSetDtxed(Intent data) {
+		DownloadFiles df = new DownloadFiles(this);
+		df.fnames=new ArrayList<>(); df.fdates=new ArrayList<>();
+		int idx=0;
+		while(true) {
+			String numstr = Integer.toString(++idx);
+			String fname = data.getStringExtra(SetDtx.idFNAME+numstr);
+			String fdate = data.getStringExtra(SetDtx.idFDATE+numstr);
+			if (fname==null || fdate==null) break;
+			df.fnames.add(fname); df.fdates.add(fdate);
+		}
+		df.verbose=true;
+		if (df.fnames.isEmpty()) ReloadAll(); else df.execute();
 	}
 
 	///////////////////////

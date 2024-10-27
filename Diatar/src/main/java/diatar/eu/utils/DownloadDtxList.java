@@ -6,10 +6,14 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import diatar.eu.TxTar;
 
@@ -49,18 +53,13 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
             URLConnection conection = url.openConnection();
             conection.connect();
             InputStream input = new BufferedInputStream(url.openStream(), 8192);
+            BufferedReader r = new BufferedReader(new InputStreamReader(input));
             byte[] data = new byte[1024];
 
-            int count;
-            while ((count = input.read(data)) != -1) {
-                if (isCancelled()) break;
-                for (int i = 0; i < count; i++) {
-                    char ch = (char) data[i];
-                    sb.append(ch);
-                }
+            for (String line; (line = r.readLine()) != null; ) {
+                sb.append(line).append('\n');
             }
 
-            // closing streams
             input.close();
 
         } catch (Exception e) {
@@ -84,6 +83,7 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
         }
 
         //sort...
+        Collections.sort(fp, new DtxParams.DtxComparator());
 
         if (fp.size()>0) {
             fparams = new DtxParams[fp.size()];
@@ -153,7 +153,22 @@ public abstract class DownloadDtxList extends AsyncTask<Void, String, Void> {
         }
         String title = sb.toString();
 
-        DtxParams tmp = new DtxParams(fname, title, grpname, order, fsize, tstamp);
+        int p7=p6;
+        inquote = false;
+        sb = new StringBuilder();
+        while (++p7<len) {
+            char ch = line.charAt(p7);
+            if (!inquote && ch==',') break;
+            if (ch=='"') {
+                if (!inquote && p7>p6+1) sb.append(ch);
+                inquote=!inquote;
+                continue;
+            }
+            if (inquote) sb.append(ch);
+        }
+        String shorttitle = sb.toString();
+
+        DtxParams tmp = new DtxParams(fname, title, shorttitle, grpname, order, fsize, tstamp);
         fp.add(tmp);
     }
 
