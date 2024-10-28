@@ -86,81 +86,14 @@ public class SetDownload extends Activity
 		finish();
 	}
 
-	public void onImportBtn(View v) {
-		Intent it = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		it.addCategory(Intent.CATEGORY_OPENABLE);
-		it.setType("*/*");
-		startActivityForResult(it, REQUEST_IMPORT);
-	}
-	
 	public void onDownNowBtn(View v) {
 		G.sDownWhen=mDownLst.getSelectedItemPosition();
 		setResult(RESULT_FIRST_USER);
 		finish();
 	}
 	
-	public void onDtx2DirBtn(View v) {
-		Intent it = new Intent(this, FileSelectorActivity.class);
-		it.putExtra(G.idFTYPE,FileSelectorActivity.ftDIR);
-		//it.putExtra(G.idDIR,mDtx2DirEd.getText().toString());
-		startActivityForResult(it,REQUEST_DTX2DIR);
-	}
-
 	public void onCancel(View v) {
 		setResult(RESULT_CANCELED);
 		finish();
-	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode==REQUEST_DTX2DIR) reqDtx2Dir(resultCode,data);
-		if (requestCode==REQUEST_IMPORT) reqImport(resultCode,data);
-	}
-
-	private void reqDtx2Dir(int resultCode, Intent data) {
-		if (resultCode!=RESULT_OK) return;
-		//mDtx2DirEd.setText(data.getStringExtra(G.idDIR));
-	}
-
-	private void reqImport(int resultCode, Intent data) {
-		if (data == null) return;
-		Uri uri = data.getData();
-		String fname = "???";
-		String fpath = "???";
-		Cursor cr = getContentResolver().query(uri,null,null,null,null,null);
-		try {
-			if (cr!=null && cr.moveToFirst()) {
-				fpath = cr.getString(0); //cr.getString(cr.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-				int idx = cr.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-				if (idx>=0) fname = cr.getString(idx);
-			}
-		} finally {
-			cr.close();
-		}
-		BufferedInputStream bin = null;
-		BufferedOutputStream bout = null;
-		ActivityCompat.requestPermissions(
-				this,
-				new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-				1);
-		try {
-			//FileInputStream sin = new FileInputStream(FileChooser.getPath(this, uri));
-			InputStream sin = getContentResolver().openInputStream(uri);
-			FileOutputStream sout = new FileOutputStream(new File(TxTar.Get().getDtx2Dir(), fname));
-			bin = new BufferedInputStream(sin);
-			bout = new BufferedOutputStream(sout);
-			byte[] buf = new byte[1024];
-			while (bin.read(buf) != -1) bout.write(buf);
-		} catch (Exception e) {
-			TxTar.Msg(this, e.getLocalizedMessage());
-		} finally {
-			try {
-				if (bin != null) bin.close();
-				if (bout != null) bout.close();
-			} catch (Exception e) {
-				TxTar.Msg(this, e.getLocalizedMessage());
-			}
-		}
 	}
 }

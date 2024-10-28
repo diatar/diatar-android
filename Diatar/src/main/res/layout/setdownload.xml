@@ -30,13 +30,6 @@
 		android:onClick="onDownNowBtn"
 		android:layout_gravity="center|center_vertical"/>
 
-	<Button
-		android:id="@+id/setDownImport"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:onClick="onImportBtn"
-		android:text="Saját DTX import" />
-
 	<CheckBox
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
