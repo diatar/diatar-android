@@ -174,7 +174,7 @@ public class EditActivity extends Activity
 		int ex = data.getIntExtra(G.idENEKINDEX,0);
 		boolean[] diak = data.getBooleanArrayExtra(G.idSEL);
 		TxTar Dtx = TxTar.Get();
-		String knev = Dtx.getNames()[dx];
+		String knev = Dtx.getDtxLst()[dx].title();
 		String enev = Dtx.getEnekLst(this,dx)[ex];
 		String[] vnevek = Dtx.getVersszakLst(this,dx,ex);
 		DiaItem dact = DiaItem.getByPos(actitem);
@@ -214,7 +214,7 @@ public class EditActivity extends Activity
 		d.mVers=data.getIntExtra(G.idENEKINDEX,0);
 		d.mVszak=data.getIntExtra(G.idDIAINDEX,0);
 		TxTar Dtx = TxTar.Get();
-		d.mKnev=Dtx.getNames()[d.mKotet];
+		d.mKnev=Dtx.getDtxLst()[d.mKotet].title();
 		d.mVnev=Dtx.getEnekLst(this,d.mKotet)[d.mVers];
 		String[] vnevek = Dtx.getVersszakLst(this,d.mKotet,d.mVers);
 		d.mSnev=vnevek[d.mVszak];

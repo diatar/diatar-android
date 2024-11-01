@@ -35,7 +35,7 @@ public final class DtxParams {
 
     public static class DtxComparator implements java.util.Comparator<DtxParams> {
         public int compare(DtxParams left, DtxParams right) {
-            if (!left.group().equals(right.group())) return left.group().compareTo(right.group());
+            if (!left.group().equals(right.group())) return left.group().compareToIgnoreCase(right.group());
             if (left.order()!=0) {
                 if (right.order()!=0) return (left.order()<right.order() ? -1 : +1);
                 return -1;  //csak baloldalon van order, az jon elobb

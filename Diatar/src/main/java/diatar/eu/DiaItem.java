@@ -177,8 +177,7 @@ public class DiaItem {
 		if (mTipus==ditTXT) return mKnev;
 		if (mTipus==ditPIC) return mVnev;
 		if (mTipus==ditDTX) {
-			String[] rarr = TxTar.Get().getShortNames();
-			String s = rarr[mKotet]+": "+mVnev;
+			String s = TxTar.Get().getDtxLst()[mKotet].nick()+": "+mVnev;
 			if (mSnev.length()>0) {
 				s+="/"+mSnev;
 				if (allvszak) {

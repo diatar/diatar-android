@@ -339,34 +339,29 @@ public class MainActivity extends MainMenu
 	}
 	
 	public void FillGrpLst() {
-		String[] narr = Dtx.getNames();
-		String[] garr = Dtx.getGrpNames();
+		DtxParams[] dtxarr = Dtx.getDtxLst();
 		mGrpLst = new ArrayList<>();
-		tGroup egrp = new tGroup();
+		String prevgrp="";
+		tGroup grp=null;
+		tGroup egrp=new tGroup();
 		egrp.Name="(nem besorolt)";
-		egrp.DtxLst = new ArrayList<>();
-		for (int i=0; i<narr.length; i++) {
-			String gnam = garr[i];
-			if (gnam.isEmpty()) {
-				egrp.DtxLst.add(i);
+		egrp.DtxLst=new ArrayList<>();
+		int idx=0;
+		for (DtxParams p : dtxarr) {
+			if (p.group().isEmpty()) {
+				egrp.DtxLst.add(idx++);
 				continue;
 			}
-			boolean found=false;
-			for (tGroup g : mGrpLst) {
-				if (g.Name.equalsIgnoreCase(gnam)) {
-					g.DtxLst.add(i);
-					found=true;
-					break;
-				}
+			if (!p.group().equalsIgnoreCase(prevgrp)) {
+				prevgrp=p.group();
+				grp=new tGroup();
+				grp.Name=(prevgrp);
+				grp.DtxLst=new ArrayList<>();
+				mGrpLst.add(grp);
 			}
-			if (found) continue;
-			tGroup grp = new tGroup();
-			grp.Name=gnam;
-			grp.DtxLst = new ArrayList<>();
-			grp.DtxLst.add(i);
-			mGrpLst.add(grp);
+			grp.DtxLst.add(idx++);
 		}
-		if (egrp.DtxLst.size()>0) mGrpLst.add(egrp);
+		if (!egrp.DtxLst.isEmpty()) mGrpLst.add(egrp);
 	}
 	
 	public void ReloadAll() {
@@ -378,11 +373,11 @@ public class MainActivity extends MainMenu
 	public void Reload(int px, int pe, int pd) {
 		ArrayList<String> xlst = new ArrayList<>();
 		if (G.sDiaFname.length()>0) xlst.add("DIA: "+G.sDiaFname);
-		String[] xarr = Dtx.getNames();
+		DtxParams[] dtxarr = Dtx.getDtxLst();
 		for (tGroup g : mGrpLst) {
 			xlst.add(g.Name);
 			for (Integer ix : g.DtxLst)
-				xlst.add("    "+xarr[ix]);
+				xlst.add("    "+dtxarr[ix].title());
 		}
 		//if (xlst.
 		ArrayAdapter<String> adp = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,xlst);

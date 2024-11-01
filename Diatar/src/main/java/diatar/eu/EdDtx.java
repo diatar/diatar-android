@@ -6,6 +6,8 @@ import android.content.*;
 import android.widget.AdapterView.*;
 import android.view.*;
 
+import diatar.eu.utils.DtxParams;
+
 public class EdDtx extends Activity
 {
 	private Spinner mDtxLst, mEnekLst;
@@ -107,11 +109,15 @@ public class EdDtx extends Activity
 	}
 	
 	private void fillDtxLst() {
+		DtxParams[] dtxlst = TxTar.Get().getDtxLst();
+		String[] namearr = new String[dtxlst.length];
+		int idx=0;
+		for (DtxParams p : dtxlst) namearr[idx++]=p.title();
 		ArrayAdapter<String> adp =
 			new ArrayAdapter<String>(
 				this,
 				android.R.layout.simple_spinner_item,
-				TxTar.Get().getNames()
+				namearr
 			);
 		mDtxLst.setAdapter(adp);
 	}

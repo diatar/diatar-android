@@ -7,24 +7,24 @@ import java.io.*;
 import android.app.*;
 import android.os.*;
 
+import diatar.eu.utils.DtxParams;
+
 public class TxTar {
 	private static TxTar instance = null;
-	
+
 	//fajlok, dtx nevek, rovid nevek, csoport
-	private String[] fnames, dnames, rnames, cnames;
+	private DtxParams[] mDtxLst;
 	//diak szama inkrementalisan:
 	//  egy kotet minden enekhez az utana kov. poz.
 	private Short[] scnts;
 	public static int CurrKotet;
-	private int _order;
-	private String _rovidnev, _csopnev;
 	public static String progdir, docdir, appspecdir, privatedir;
 	
 	private TxTar(Context ctx) { LoadNames(ctx); }
 
 	public boolean hasFile(String fname) {
-		for (String s : fnames)
-			if (s.equals(fname)) return true;
+		for (DtxParams p : mDtxLst)
+			if (p.fname().equals(fname)) return true;
 		return false;
 	}
 //////////////////////
@@ -71,12 +71,9 @@ public class TxTar {
 		adlg.show();
 	}
 /////////////////////
-	public String[] getNames() { return dnames; }
-	
-	public String[] getShortNames() { return rnames; }
-	
-	public String[] getGrpNames() { return cnames; }
-	
+
+	public DtxParams[] getDtxLst() { return mDtxLst; }
+
 	public Short[] getCnts() { return scnts; }
 	
 	public int getCount() {
@@ -128,6 +125,7 @@ public class TxTar {
 		ArrayList<String> clst = new ArrayList<String>();
 		ArrayList<Integer> sor = new ArrayList<Integer>();
 
+		ArrayList<DtxParams> dtxlst = new ArrayList<>();
 		ProgressDialog dlg=ProgressDialog.show(ctx,"Betöltés...","",true);
 		SharedPreferences sp = ctx.getSharedPreferences("dtxs", Context.MODE_PRIVATE);
 		for (int pass=1; pass<=2; pass++) {
@@ -136,16 +134,10 @@ public class TxTar {
 				dir.mkdirs();
 				String[] fl = dir.list();
 				for (String fname : fl) {
-					//File f = new File(fname); f.delete();
-					//fname="";
 					if (fname.endsWith(".dtx")) {
 						if (sp.getString(fname, "").equals("X")) continue;
-						if (dlg!=null) dlg.setMessage(fname);
-						flst.add(fname);
-						dlst.add(getDtxName(new File(dir,fname)));
-						rlst.add(_rovidnev);
-						clst.add(_csopnev);
-						sor.add(_order<=0 ? Integer.MAX_VALUE : _order);
+						dlg.setMessage(fname);
+						dtxlst.add(DtxParams.calcParamsOf(new File(dir,fname)));
 					}
 				}
 			} catch (Exception e) {
@@ -153,78 +145,33 @@ public class TxTar {
 			}
 		}
 		
-		if (dlg!=null) dlg.setMessage("Rendezés...");
-		int n = dlst.size();
-		for (int pdest=0; pdest<n; pdest++) {
-			if (dlg!=null) { dlg.setMax(n); dlg.setProgress(pdest); }
-			int p=pdest, pv=sor.get(pdest);
-			String ps=dlst.get(pdest);
-			for (int i=pdest+1; i<n; i++) {
-				int v=sor.get(i);
-				String vs=dlst.get(i);
-				if (pv>v || (pv==v && ps.compareTo(vs)>0)) { p=i; pv=v; ps=vs; }
-			}
-			if (p>pdest) {
-				sor.set(p,sor.get(pdest)); sor.set(pdest,pv);
-				dlst.set(p,dlst.get(pdest)); dlst.set(pdest,ps);
-				String xs;
-				xs=flst.get(pdest); flst.set(pdest,flst.get(p)); flst.set(p,xs);
-				xs=rlst.get(pdest); rlst.set(pdest,rlst.get(p)); rlst.set(p,xs);
-				xs=clst.get(pdest); clst.set(pdest,clst.get(p)); clst.set(p,xs);
-			}
-		}
-		if (n<=0) {
-			dlst.add("<nincsenek énektárak!>");
-			flst.add("");
-			rlst.add("");
-			clst.add("");
+		dlg.setMessage("Rendezés...");
+		Collections.sort(dtxlst, new DtxParams.DtxComparator());
+
+		if (dtxlst.isEmpty()) {
+			dtxlst.add(new DtxParams("", "<nincsenek énektárak!>", "", "", 0, 0, ""));
 		}
 
-		if (dlg!=null) dlg.dismiss();
-		dnames = new String[dlst.size()];
-		dlst.toArray(dnames);
-		fnames = new String[flst.size()];
-		flst.toArray(fnames);
-		rnames = new String[rlst.size()];
-		rlst.toArray(rnames);
-		cnames = new String[clst.size()];
-		clst.toArray(cnames);
-	}
-	
-	public String getDtxName(File f) throws IOException {
-		FileInputStream fis = new FileInputStream(f);
-		BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
-		_order=0;
-		String res = f.getName();
-		_rovidnev=res;
-		String ln = rd.readLine();
-		_csopnev="";
-		while(ln!=null) {
-			if (ln.startsWith(">")) break;
-			if (ln.startsWith("S")) _order=Integer.valueOf(ln.substring(1));
-			if (ln.startsWith("N")) res=ln.substring(1);
-			if (ln.startsWith("R")) _rovidnev=ln.substring(1);
-			if (ln.startsWith("C")) _csopnev=ln.substring(1);
-			ln = rd.readLine();
-		}
-		
-		return res;
+		dlg.dismiss();
+		mDtxLst = new DtxParams[dtxlst.size()];
+		dtxlst.toArray(mDtxLst);
 	}
 	
 	public String[] getEnekLst(Context ctx, int kotet) {
-		if (fnames[kotet].isEmpty()) {
+		DtxParams par = mDtxLst[kotet];
+		if (par.fname().isEmpty()) {
 			String[] res = new String[1];
 			res[0]="";
 			return res;
 		}
 		ProgressDialog dlg = null;
-		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Éneklista...",dnames[kotet],true);
+		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Éneklista...",par.title(),true);
 		ArrayList<String> lst = new ArrayList<String>();
 		ArrayList<Short> cntlst = new ArrayList<Short>();
 		short scnt=0;
 		try {
-			File f = new File(progdir,fnames[kotet]);
-			if (!f.exists()) f = new File(getDtx2Dir(),fnames[kotet]);
+			File f = new File(progdir,par.fname());
+			if (!f.exists()) f = new File(getDtx2Dir(),par.fname());
 			FileInputStream fis = new FileInputStream(f);
 			BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
 			String enek=""; boolean separ=false;
@@ -281,17 +228,18 @@ public class TxTar {
 	}
 	
 	public String[] getVersszakLst(Context ctx, int kotet, int enek) {
-		if (fnames[kotet].isEmpty()) {
+		DtxParams par = mDtxLst[kotet];
+		if (par.fname().isEmpty()) {
 			String[] res = new String[1];
 			res[0]="";
 			return res;
 		}
 		ProgressDialog dlg = null;
-		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Versszaklista...",dnames[kotet],true);
+		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Versszaklista...",par.title(),true);
 		ArrayList<String> lst = new ArrayList<String>();
 		try {
-			File f = new File(progdir,fnames[kotet]);
-			if (!f.exists()) f = new File(getDtx2Dir(),fnames[kotet]);
+			File f = new File(progdir,par.fname());
+			if (!f.exists()) f = new File(getDtx2Dir(),par.fname());
 			FileInputStream fis = new FileInputStream(f);
 			BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
 			enek++;
@@ -331,15 +279,16 @@ public class TxTar {
 	
 	public HaromDia getDia3(int cnt,Context ctx, int kx, int ex, int dx) {
 		HaromDia res = new HaromDia();
-		if (kx<0 || kx>=fnames.length || fnames[kx].isEmpty()) {
-			return res;
-		}
+		if (kx<0 || kx>=mDtxLst.length) return res;
+		DtxParams par = mDtxLst[kx];
+		if (par.fname().isEmpty()) return res;
+
 		ProgressDialog dlg = null;
-		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Dia...",dnames[kx],true);
+		if (ctx!=null) dlg=ProgressDialog.show(ctx,"Dia...",par.title(),true);
 		ArrayList<String> lst = new ArrayList<String>();
 		try {
-			File f = new File(progdir,fnames[kx]);
-			if (!f.exists()) f = new File(getDtx2Dir(),fnames[kx]);
+			File f = new File(progdir,par.fname());
+			if (!f.exists()) f = new File(getDtx2Dir(),par.fname());
 			FileInputStream fis = new FileInputStream(f);
 			BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
 			ex++; dx++;
@@ -381,10 +330,10 @@ public class TxTar {
 	}
 	
 	public String getDiaTitle(Context ctx, int kx, int ex, int vx) {
-		if (kx<0 || kx>=rnames.length) return "?";
+		if (kx<0 || kx>=mDtxLst.length) return "?";
 		String[] elst = getEnekLst(ctx,kx);
 		String[] vlst = getVersszakLst(ctx,kx,ex);
-		String res=rnames[kx]+": "+
+		String res=mDtxLst[kx].nick()+": "+
 			(ex<0 || ex>=elst.length ? "?" : elst[ex])+
 			(vx<0 || vx>=vlst.length ? "?" :
 				(vlst.length==1 && vlst[0]=="---" ? "" : "/"+vlst[vx]));
@@ -483,13 +432,14 @@ public class TxTar {
 		ArrayList<String> idlst,
 		ArrayList<Integer> vxlst,
 		ArrayList<Integer> sxlst) {
-		if (fnames[kotet].isEmpty()) return;
+		DtxParams par = mDtxLst[kotet];
+		if (par.fname().isEmpty()) return;
 
 		ProgressDialog dlg = null;
-		if (ctx!=null) dlg=ProgressDialog.show(ctx,"ID lista...",dnames[kotet],true);
+		if (ctx!=null) dlg=ProgressDialog.show(ctx,"ID lista...",par.title(),true);
 		try {
-			File f = new File(progdir,fnames[kotet]);
-			if (!f.exists()) f = new File(getDtx2Dir(),fnames[kotet]);
+			File f = new File(progdir,par.fname());
+			if (!f.exists()) f = new File(getDtx2Dir(),par.fname());
 			FileInputStream fis = new FileInputStream(f);
 			BufferedReader rd = new BufferedReader(new InputStreamReader(fis));
 			String ln;

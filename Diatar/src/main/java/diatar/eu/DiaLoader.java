@@ -10,6 +10,8 @@ import java.util.*;
 import android.*;
 import androidx.core.app.ActivityCompat;
 
+import diatar.eu.utils.DtxParams;
+
 public class DiaLoader extends Activity
 {
 	public final static String itDIR = "dir";
@@ -24,10 +26,10 @@ public class DiaLoader extends Activity
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ActivityCompat.requestPermissions(
-			this,
-			new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-			1);
+		//ActivityCompat.requestPermissions(
+		//	this,
+		//	new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+		//	1);
 		
 		setContentView(R.layout.dialoader);
 		Lbl = (TextView)findViewById(R.id.dlLbl);
@@ -214,7 +216,10 @@ class DI_Loader extends AsyncTask<DiaLoader,String,String> {
 		}
 		
 		TxTar Dtx = TxTar.Get();
-		String[] karr = Dtx.getNames();
+		DtxParams[] dtxlst = Dtx.getDtxLst();
+		String[] karr = new String[dtxlst.length];
+		int idx=0;
+		for (DtxParams p : dtxlst) karr[idx++]=p.title();
 		List<String> klst = Arrays.asList(karr);
 		int n=lst.size(), i=0;
 		for (String kstr : lst) {
@@ -247,8 +252,8 @@ class DI_Loader extends AsyncTask<DiaLoader,String,String> {
 	}
 	
 	private boolean RealizeDtxId() {
-		String[] karr = TxTar.Get().getNames();
-		int n = karr.length;
+		DtxParams[] dtxlst = TxTar.Get().getDtxLst();
+		int n = dtxlst.length;
 		for (int kx=0; kx<n; kx++) {
 			SetPercent("Azonosítás...",50+(50*kx)/n);
 			if (isCancelled()) return false;
@@ -275,7 +280,7 @@ class DI_Loader extends AsyncTask<DiaLoader,String,String> {
 						d.mKotet=kx;
 						d.mVers=vxlst.get(ix);
 						d.mVszak=sxlst.get(ix);
-						d.mKnev=karr[kx];
+						d.mKnev=dtxlst[kx].title();
 						d.mVnev=varr[d.mVers];
 						String[] sarr = TxTar.Get().getVersszakLst(null,kx,d.mVers);
 						d.mSnev=sarr[d.mVszak];
