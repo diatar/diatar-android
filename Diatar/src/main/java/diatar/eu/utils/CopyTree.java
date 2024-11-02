@@ -11,14 +11,14 @@ public class CopyTree extends AsyncTask<Void, Void, String>
 	private ProgressDialog mDlg;
 	private String mMsgTxt,mErrTxt;
 	private int perc0,perc1,percf,max0;
-	private Context mCtx;
+	private final Context mCtx;
 	public String mFromPath,mToPath;
 	public boolean mCutMode;
 	private String mModeTxt;
 	private int mLevel;
 
 	public interface ICallback {
-		public void CutCopyFinished(String txt);
+		void CutCopyFinished(String txt);
 	}
 	
 	public CopyTree(Context context) {
@@ -35,12 +35,7 @@ public class CopyTree extends AsyncTask<Void, Void, String>
 		mDlg = ProgressDialog.show(mCtx,
 			mModeTxt,"",
 			false,true,
-			new DialogInterface.OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					cancel(false);
-				}
-			});
+				dialog -> cancel(false));
 			//mDlg.setProgressStyle(mDlg.STYLE_HORIZONTAL);
 		mDlg.setMax(100); mDlg.setProgress(0);
 		mDlg.setIndeterminate(false);
@@ -66,11 +61,8 @@ public class CopyTree extends AsyncTask<Void, Void, String>
 	{
 		super.onProgressUpdate();
 		if (max0==0) max0=1;
-		mDlg.setMessage(	//Integer.toString(perc0+perc1/max0)+"% "+
-			mMsgTxt+" "+Integer.toString(percf)+"%");
+		mDlg.setMessage(mMsgTxt+" "+percf+"%");
 		mDlg.setProgress(perc0+perc1/max0);
-		//mDlg.setMax(100);
-		//mDlg.setSecondaryProgress(percf);
 	}
 
 	@Override

@@ -9,10 +9,7 @@ import android.content.*;
 import java.lang.*;
 import java.io.*;
 import java.util.*;
-import android.*;
 import diatar.eu.utils.*;
-
-import androidx.core.app.ActivityCompat;
 
 public class FileSelectorActivity extends Activity
 	implements PopupMenu.OnMenuItemClickListener
@@ -86,16 +83,16 @@ public class FileSelectorActivity extends Activity
 	
 	@Override
     protected void onCreate(Bundle bd) {
-        super.onCreate(bd);
+		super.onCreate(bd);
 
-		ActivityCompat.requestPermissions(
-			this,
-			new String[]{
-				Manifest.permission.WRITE_EXTERNAL_STORAGE,
-				Manifest.permission.MANAGE_EXTERNAL_STORAGE
-			},
-			1);
-		
+		//ActivityCompat.requestPermissions(
+		//	this,
+		//	new String[]{
+		//		Manifest.permission.WRITE_EXTERNAL_STORAGE,
+		//		Manifest.permission.MANAGE_EXTERNAL_STORAGE
+		//	},
+		//	1);
+
 		setContentView(R.layout.fileselector);
 		Lst = findViewById(R.id.fsLst);
 		DirTxt = findViewById(R.id.fsDir);
@@ -123,7 +120,7 @@ public class FileSelectorActivity extends Activity
 		}
 		
 		mCurrDir="";
-		mDirLst = new ArrayList<String>();
+		mDirLst = new ArrayList<>();
 		mDirLst.add("#");
 		LstAdapter = new FSAdapter(this,mDirLst);
 		Lst.setAdapter(LstAdapter);
@@ -145,7 +142,7 @@ public class FileSelectorActivity extends Activity
 			f.mkdirs();
 			setDir(f.getAbsolutePath()+"/");
 		}
-	};
+	}
 	
 	@Override
 	protected void onSaveInstanceState(Bundle bd)
@@ -257,7 +254,7 @@ public class FileSelectorActivity extends Activity
 			setDir(f.getAbsolutePath()+"/");
 			return;
 		} else if (line.equals(fnAPPSPEC)) {
-			setDir(TxTar.Get().appspecdir);
+			setDir(TxTar.appspecdir);
 			return;
 		} else if (s.startsWith("<")) {
 			s=s.substring(1,s.length()-1);
@@ -296,13 +293,11 @@ public class FileSelectorActivity extends Activity
 		it.putExtra(G.idFNAME,s);
 		it.putExtra(G.idISDIR,isdir);
 		startActivityForResult(it,REQUEST_RENAME);
-		return;
 	}
 	
 	private void doNew() {
 		Intent it = new Intent(this, RenameFile.class);
 		startActivityForResult(it,REQUEST_NEW);
-		return;
 	}
 	
 	private void doDel() {
@@ -353,11 +348,11 @@ public class FileSelectorActivity extends Activity
 	private void doCutCopy(boolean cutmode, String txt) {
 		String err=commonCutCopy();
 		if (!err.isEmpty()) {
-			TxTar.Get().Msg(this,txt+" sikertelen:\n"+err);
+			TxTar.Msg(this,txt+" sikertelen:\n"+err);
 			return;
 		}
 		mCutMode=cutmode;
-		TxTar.Get().Msg(this,txt+" előkészítve:\n"+mCopyPath);
+		TxTar.Msg(this,txt+" előkészítve:\n"+mCopyPath);
 	}
 	
 	private void doCut() { doCutCopy(true,"Áthelyezés"); }
@@ -366,7 +361,7 @@ public class FileSelectorActivity extends Activity
 	
 	private void doInsert() {
 		if (mCopyPath==null || mCopyPath.isEmpty()) {
-			TxTar.Get().Msg(this,"Nincs mit beilleszteni!");
+			TxTar.Msg(this,"Nincs mit beilleszteni!");
 			return;
 		}
 		CopyTree ct = new CopyTree(this);
@@ -380,8 +375,7 @@ public class FileSelectorActivity extends Activity
 	//callback
 	public void CutCopyFinished(String txt) {
 		setDir(mCurrDir);
-		TxTar Dtx = TxTar.Get();
-		Dtx.OkBox(this,txt,"fájl");
+		TxTar.OkBox(this,txt,"fájl");
 	}
 
 	///////////////////
@@ -470,15 +464,15 @@ public class FileSelectorActivity extends Activity
 		} else {
 			TxTar.Msg(this,"Átnevezés nem sikerült!!!\n");
 		}
-		return;
 	}
 	
 	private boolean delDir(String dirname) {
 		if (!dirname.endsWith("/")) dirname+="/";
 		File dir = new File(dirname);
 		String[] lst = dir.list();
+		if (lst==null) return false;
 		for (String fn : lst) {
-			if (fn=="." || fn=="..") continue;
+			if (fn.equals(".") || fn.equals("..")) continue;
 			File f = new File(dirname,fn);
 			if (f.isDirectory()) {
 				if (!delDir(dirname+fn))
@@ -496,19 +490,18 @@ public class FileSelectorActivity extends Activity
 		String line = mDirLst.get(mActItem);
 		String s=line.substring(2);
 		String sd=s.substring(1,s.length()-1);
-		File f = new File(mCurrDir+sd);
 		if (delDir(mCurrDir+sd)) {
 			TxTar.Msg(this,s+" törölve.");
 			mDirLst.remove(mActItem);
 			LstAdapter.notifyDataSetChanged();
 		} else
 			TxTar.Msg(this,s+" törlése nem sikerült!");
-	};
+	}
 	
 	private void reqNew(int resultCode, Intent data) {
 		if (resultCode!=RESULT_OK) return;
 		String s = data.getStringExtra(G.idFNAME);
-		if (s.isEmpty())
+		if (s==null || s.isEmpty())
 			return;
 		File f = new File(mCurrDir,s);
 		if (f.exists() || f.isFile() || f.isDirectory()) {
@@ -537,8 +530,8 @@ public class FileSelectorActivity extends Activity
 ////////////////////////
 
 class FSAdapter extends BaseAdapter {
-	private FileSelectorActivity mCtx;
-	private ArrayList<String> mData;
+	private final FileSelectorActivity mCtx;
+	private final ArrayList<String> mData;
 	
 	public FSAdapter(FileSelectorActivity ctx, ArrayList<String> data) {
 		mCtx=ctx;
@@ -559,7 +552,7 @@ class FSAdapter extends BaseAdapter {
 	
 	public View getView(int pos, View cv, ViewGroup parent) {
 		if (cv==null) {
-			LayoutInflater li = (LayoutInflater)mCtx.getSystemService(mCtx.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater li = (LayoutInflater)mCtx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			cv = li.inflate(R.layout.fslistitem,parent,false);
 		}
 		TextView t1 = cv.findViewById(R.id.fsRowType);
