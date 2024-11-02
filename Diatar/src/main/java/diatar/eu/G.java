@@ -18,7 +18,6 @@ public class G  //globals
 	public static final String idDOWNWHEN = "NetWhen";
 	public static final String idDOWNLASTDAY = "LastNetDay";
 	public static final String idDIR = "LoadDir";
-	public static final String idURI = "Uri";
 	public static final String idDTXINDEX = "DtxIndex";
 	public static final String idENEKINDEX = "EnekIndex";
 	public static final String idDIAINDEX = "DiaIndex";
@@ -64,6 +63,13 @@ public class G  //globals
 	public static final String idBORDERR = "BorderR";
 	public static final String idBORDERB = "BorderB";
 	public static final String idBOLDTEXT = "BoldText";
+	public static final String idFINISHED = "Finished";
+	public static final String idCHECKED = "Checked";
+	public static final String idDELETED = "Deleted";
+	public static final String idGROUP = "Group";
+	public static final String idDELETABLE = "Deletable";
+	public static final String idFDATE = "FDate";
+
 	
 	public static int sBkColor, sTxColor, sBlankColor,sHighColor;
 	public static int sFontSize, sTitleSize;
@@ -186,7 +192,7 @@ public class G  //globals
 		spe.putInt(idBORDERB, sBorderB);
 		spe.putBoolean(idBOLDTEXT,sBoldText);
 		
-		spe.commit();
+		spe.apply();
 	}
 	
 	public static String getVersion(Context ctx) {
@@ -213,7 +219,7 @@ public class G  //globals
 		if (fname==null || fname.isEmpty()) return fname;
 		File fn = new File(fname);
 		if (fn.isDirectory()) return fname;
-		return fn.getParent()+fn.separator;
+		return fn.getParent()+File.separator;
 	}
 	
 	static public String nameOf(String fname) {

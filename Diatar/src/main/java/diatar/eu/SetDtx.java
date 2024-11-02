@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,10 +28,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import diatar.eu.utils.DownloadDtxList;
-import diatar.eu.utils.DownloadFiles;
 import diatar.eu.utils.DtxParams;
 
 class DtxLstItem {
@@ -55,6 +54,7 @@ public class SetDtx  extends Activity {
 
     private DownloadDtxList mDDL;
     private ArrayList<DtxLstItem> mDtxArr;
+    private int mDDLFinished;   //0=nem vegzett, 1=vegzett, -1=sikertelen
 
     @Override
     protected void onCreate(Bundle bd) {
@@ -68,56 +68,108 @@ public class SetDtx  extends Activity {
         LinearLayoutManager lm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mDtxLst.setLayoutManager(lm);
 
-        SharedPreferences sp = getSharedPreferences("dtxs", Context.MODE_PRIVATE);
         mDtxArr = new ArrayList<>();
-        DtxLstItem dli = new DtxLstItem();
-        dli.mIsChecked=false;
-        dli.mIsDeleted=false;
-        dli.mIsDeletable=false;
-        dli.mIsGroup=true;
-        dli.mText="(saját)";
-        mDtxArr.add(dli);
-        boolean allchecked=true;
-        File dir = new File(TxTar.Get().getDtx2Dir());
-        String[] fl = dir.list();
-        for (String fname : fl) {
-            if (fname.endsWith(".dtx")) {
-                DtxParams par=null;
-                try {
-                    par=DtxParams.calcParamsOf(new File(dir, fname));
-                } catch (Exception e) {
-                    TxTar.Msg(this, "Err: "+e.getLocalizedMessage());
-                    continue;
-                }
-                DtxLstItem childitem = new DtxLstItem();
-                childitem.mIsChecked=!sp.getString(par.fname(),"").equals("X");
-                childitem.mIsDeleted=false;
-                childitem.mIsDeletable=true;
-                childitem.mIsGroup=false;
-                childitem.mText=par.title();
-                childitem.mFName=par.fname();
-                allchecked=allchecked && childitem.mIsChecked;
-                mDtxArr.add(childitem);
-            }
-        }
-        dli.mIsChecked=allchecked;
+        mDDLFinished=0;
+        mDDL=null;
+        if (bd==null) FillDtxPrivate(); else loadInstanceState(bd);
 
         mDtxAdapter = new DtxLstAdapter(mDtxArr);
         mDtxLst.setAdapter(mDtxAdapter);
-        mDtxLst.setEnabled(false);
 
-        mDDL = new DownloadDtxList(this, false) {
-            @Override
-            public void Finished() {
-                FillDtxLst();
-            }
-        };
-        mDDL.execute();
+        if (mDDLFinished==0) {
+            mDtxLst.setEnabled(false);
+            mDDL = new DownloadDtxList(this, false) {
+                @Override
+                public void Finished() {
+                    FillDtxLst();
+                }
+            };
+            mDDL.execute();
+        } else {
+            if (mDDLFinished<0) showNetError(); else mWaitLbl.setVisibility(View.GONE);
+        }
     }
 
-    public void FillDtxLst() {
+    private void FillDtxPrivate() {
+        SharedPreferences sp = getSharedPreferences("dtxs", Context.MODE_PRIVATE);
+        DtxLstItem dli = new DtxLstItem();
+        dli.mIsChecked = false;
+        dli.mIsDeleted = false;
+        dli.mIsDeletable = false;
+        dli.mIsGroup = true;
+        dli.mText = "(saját)";
+        mDtxArr.add(dli);
+        boolean allchecked = true;
+        File dir = new File(TxTar.Get().getDtx2Dir());
+        String[] fl = dir.list();
+        if (fl!=null) for (String fname : fl) {
+            if (fname.endsWith(".dtx")) {
+                DtxParams par;
+                try {
+                    par = DtxParams.calcParamsOf(new File(dir, fname));
+                } catch (Exception e) {
+                    TxTar.Msg(this, "Err: " + e.getLocalizedMessage());
+                    continue;
+                }
+                DtxLstItem childitem = new DtxLstItem();
+                childitem.mIsChecked = !sp.getString(par.fname(), "").equals("X");
+                childitem.mIsDeleted = false;
+                childitem.mIsDeletable = true;
+                childitem.mIsGroup = false;
+                childitem.mText = par.title();
+                childitem.mFName = par.fname();
+                allchecked = allchecked && childitem.mIsChecked;
+                mDtxArr.add(childitem);
+            }
+        }
+        dli.mIsChecked = allchecked;
+    }
+
+    private void loadInstanceState(Bundle bd) {
+        mDDLFinished=bd.getInt(G.idFINISHED);
+        int n=bd.getInt(G.idCOUNT,0);
+        for (int idx=0; idx<n; idx++) {
+            DtxLstItem dli = new DtxLstItem();
+            String idxstr = Integer.toString(idx);
+            dli.mIsChecked=bd.getBoolean(G.idCHECKED+idxstr);
+            dli.mIsDeleted=bd.getBoolean(G.idDELETED+idxstr);
+            dli.mIsDeletable=bd.getBoolean(G.idDELETABLE+idxstr);
+            dli.mIsGroup=bd.getBoolean(G.idGROUP+idxstr);
+            dli.mText=bd.getString(G.idTXT+idxstr);
+            dli.mFName=bd.getString(G.idFNAME);
+            dli.mFDate=bd.getString(G.idFDATE);
+            mDtxArr.add(dli);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putInt(G.idFINISHED, mDDLFinished);
+        outState.putInt(G.idCOUNT, mDtxArr.size());
+        for (int idx=0; idx<mDtxArr.size(); idx++) {
+            DtxLstItem dli = mDtxArr.get(idx);
+            String idxstr = Integer.toString(idx);
+            outState.putBoolean(G.idCHECKED+idxstr, dli.mIsChecked);
+            outState.putBoolean(G.idDELETED+idxstr, dli.mIsDeleted);
+            outState.putBoolean(G.idDELETABLE+idxstr, dli.mIsDeletable);
+            outState.putBoolean(G.idGROUP+idxstr, dli.mIsGroup);
+            outState.putString(G.idTXT+idxstr, dli.mText);
+            outState.putString(G.idFNAME+idxstr, dli.mFName);
+            outState.putString(G.idFDATE+idxstr, dli.mFDate);
+        }
+    }
+
+    private void showNetError() {
+        mWaitLbl.setText("Hálózati hiba...");
+    }
+
+    private void FillDtxLst() {
         if (mDDL.fparams==null) {
-            mWaitLbl.setText("Hálózati hiba...");
+            showNetError();
+            mDDL=null; //free up
+            mDDLFinished=-1;
             return;
         }
 
@@ -140,7 +192,7 @@ public class SetDtx  extends Activity {
                 allchecked=true;
             }
             dli = new DtxLstItem();
-            dli.mIsChecked=!sp.getString(dp.fname(),"").equals("X");;
+            dli.mIsChecked=!sp.getString(dp.fname(),"").equals("X");
             dli.mIsDeleted=false;
             dli.mIsDeletable=false;
             dli.mIsGroup=false;
@@ -157,6 +209,8 @@ public class SetDtx  extends Activity {
         //mDtxLst.setVisibility(View.VISIBLE);
         mDtxLst.invalidate();
         mWaitLbl.setVisibility(View.GONE);
+        mDDL=null; //free up
+        mDDLFinished=1;
     }
 
     public void onImport(View v) {
@@ -191,7 +245,7 @@ public class SetDtx  extends Activity {
             it.putExtra(idFNAME+numstr, dli.mFName);
             it.putExtra(idFDATE+numstr, dli.mFDate);
         }
-        ed.commit();
+        ed.apply();
 
         setResult(RESULT_OK, it);
         finish();
@@ -217,7 +271,7 @@ public class SetDtx  extends Activity {
                 if (idx>=0) fname = cr.getString(idx);
             }
         } finally {
-            cr.close();
+            if (cr!=null) cr.close();
         }
 
         if (!fname.toLowerCase().endsWith(".dtx")) {
@@ -379,7 +433,7 @@ class DtxLstAdapter extends RecyclerView.Adapter<DtxLstAdapter.ViewHolder> {
         while (allchecked && ++idx<cnt) {
             item=localDataset.get(idx);
             if (item.mIsGroup) break;
-            allchecked=allchecked && item.mIsChecked;
+            allchecked=item.mIsChecked;
         }
         if (groupitem.mIsChecked!=allchecked) {
             groupitem.mIsChecked=allchecked;
@@ -398,16 +452,16 @@ class DtxLstAdapter extends RecyclerView.Adapter<DtxLstAdapter.ViewHolder> {
         }
         notifyItemChanged(idx);
         if (!groupcanchange) return;
-        while (true) {
+        do {
             if (--idx<0) return; //no group???
             item = localDataset.get(idx);
-            if (item.mIsGroup) break;
-        }
+        } while (!item.mIsGroup);
         if (!item.mIsChecked) return; //no change
         item.mIsChecked=false;
         notifyItemChanged(idx);
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext())
