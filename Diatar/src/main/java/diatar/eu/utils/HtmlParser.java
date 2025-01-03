@@ -156,8 +156,8 @@ public class HtmlParser {
             }
 
             //fejlec dekodolasa
-            int p2=p++;
-            while (p<len && html.charAt(p)!=' ' && html.charAt(p)!='>') p++;
+            int p2=++p;
+            while (p<len && html.charAt(p)!=' ' && html.charAt(p)!='/' && html.charAt(p)!='>') p++;
             nameStr=html.substring(p2,p);
             p=parseProperties(html,p);
             if (p>=len) return p;

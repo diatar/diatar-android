@@ -1,5 +1,7 @@
 package diatar.eu.utils;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -31,7 +33,8 @@ public class DecodeBreviar {
   private void addLine(String txt) {
     if (mCurrLit==null) startVers("???");
     int p0=0;
-    ArrayList<String> lit = new ArrayList<>(Arrays.asList(mCurrLit.mTxt));
+    ArrayList<String> lit;
+    lit = ( mCurrLit.mTxt==null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(mCurrLit.mTxt)) );
     while (p0<txt.length()) {
       int p=minX(txt.indexOf('\n',p0), txt.indexOf('\r', p0));   /* 240101_0c Dicsoseg... */
       if (p<0) break;
@@ -57,7 +60,7 @@ public class DecodeBreviar {
   private void startVszak(String txt) {
     int ps=mPsalmState;
     if (mCurrLit==null) startVers("???");
-    if (mCurrLit.mTxt.length>0) startVers(mVersNev);
+    if (mCurrLit.mTxt!=null && mCurrLit.mTxt.length>0) startVers(mVersNev);
     mPsalmState=ps;
     mCurrLit.mKnev=mVersNev+"/"+txt;
   }
@@ -74,7 +77,7 @@ public class DecodeBreviar {
           sb.append(allTxt(t)); sb.append(' ');
         }
       }
-      sb.append(tat.txt);
+      if (tat.txt!=null) sb.append(tat.txt);
       first=false;
     }
     return sb.toString();
@@ -88,8 +91,9 @@ public class DecodeBreviar {
     isKonyorges=false;
 
     while(mFound!=null) {
-      mCurrTag=mFound.tag;
+      mCurrTag=mFound.tag; if (mCurrTag==null) break;
       String cls=mCurrTag.getClassName();
+      Log.d("DecodeBreviar", mCurrTag.getNameStr()+": class='"+cls+"'");
       if (!afterhdr) {
         if (cls.equals("tts_heading")) afterhdr=true;
       } else //tts_heading utan vagyunk
@@ -243,7 +247,7 @@ public class DecodeBreviar {
         if (tat.tag.getClassName().contains("red")) continue;
         if (tat.tag.getNameStr().equals("p")) { sb.append(' '); sb.append(allTxt(tat.tag)); }
       }
-      sb.append(' '); sb.append(tat.txt);
+      sb.append(' '); if (tat.txt!=null) sb.append(tat.txt);
     }
     addLine("Ant: "+sb.toString().trim());
   }
@@ -336,7 +340,8 @@ public class DecodeBreviar {
       mFound=f;
       return;
     }
-    addLine("??? <p class=\"strong\">"+allTxt(mCurrTag)+"</p>");
+    startVers("Ima");
+    addLine(s);
   }
 
   private int tordeles(String txt, int startpos, int vszak) {
@@ -387,7 +392,7 @@ public class DecodeBreviar {
       if (cls.equals("reading-title")) continue;
       if (cls.equals("reading-source")) continue;
       if (cls.equals("resp")) {
-        startVszak("/Resp");
+        startVszak("Resp");
         continue;
       }
       if (cls.equals("respV")) {

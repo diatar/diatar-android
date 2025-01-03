@@ -683,6 +683,13 @@ public class MainActivity extends MainMenu
 		ReloadAll();
 		MPAdapter.notifyDataSetChanged();
 	}
+
+	@Override
+	protected void whenZsolozsma() {
+		TxTar.Msg(this,"Zsolozsma betöltve.");
+		ReloadAll();
+		MPAdapter.notifyDataSetChanged();
+	}
 	
 	@Override
 	protected void whenSetNeted() {

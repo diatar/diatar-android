@@ -18,7 +18,7 @@ public class TxTar {
 	//  egy kotet minden enekhez az utana kov. poz.
 	private Short[] scnts;
 	public static int CurrKotet;
-	public static String progdir, docdir, appspecdir, privatedir;
+	public static String progdir, docdir, appspecdir, privatedir, zsolozsmadir;
 	
 	private TxTar(Context ctx) { LoadNames(ctx); }
 
@@ -35,12 +35,16 @@ public class TxTar {
 			File fp = new File(progdir,"private");
 			fp.mkdir();
 			privatedir=fp.toString();
+			fp = new File(progdir, "zsolozsma");
+			fp.mkdir();
+			zsolozsmadir=fp.toString();
 			File f = new File(
 				Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
 				, "diatar/"
 			);
 			docdir=f.getAbsolutePath();
 			appspecdir=ctx.getExternalFilesDir(null).toString();
+
 			instance=new TxTar(ctx);
 		}
 		return instance;
@@ -119,12 +123,6 @@ public class TxTar {
 	}
 	
 	public void LoadNames(Context ctx) {
-		ArrayList<String> flst = new ArrayList<String>();
-		ArrayList<String> dlst = new ArrayList<String>();
-		ArrayList<String> rlst = new ArrayList<String>();
-		ArrayList<String> clst = new ArrayList<String>();
-		ArrayList<Integer> sor = new ArrayList<Integer>();
-
 		ArrayList<DtxParams> dtxlst = new ArrayList<>();
 		ProgressDialog dlg=ProgressDialog.show(ctx,"Betöltés...","",true);
 		SharedPreferences sp = ctx.getSharedPreferences("dtxs", Context.MODE_PRIVATE);

@@ -17,6 +17,7 @@ public class MainMenu extends FragmentActivity
 	protected void onMenuLoad() { doMenuLoad(); }
 	protected void onMenuEdit() { doMenuEdit(); }
 	protected void onMenuSave() {}
+	protected void onMenuZsolozsma() { doMenuZsolozsma(); }
 	protected void onMenuSetDownload() { doMenuDown(); }
 	protected void onMenuSetNet() { doMenuNet(); }
 	protected void onMenuSetProject() { doMenuProj(); }
@@ -49,19 +50,22 @@ public class MainMenu extends FragmentActivity
 	
 	protected void whenEdited() {}
 
+	protected void whenZsolozsma() {}
+
 	protected void whenSetDtxed(Intent data) {}
 	
 	////////////////////
 	// feldolgozas
 	////////////////////
 	
-	private static final int REQUEST_FILELOAD = 101;
-	private static final int REQUEST_LOADING = 102;
-	private static final int REQUEST_NETING  = 104;
-	private static final int REQUEST_DOWNING  = 105;
-	private static final int REQUEST_PROJING  = 106;
-	private static final int REQUEST_EDITING  = 107;
-	private static final int REQUEST_DTXING = 108;
+	protected static final int REQUEST_FILELOAD = 101;
+	protected static final int REQUEST_LOADING = 102;
+	protected static final int REQUEST_NETING  = 104;
+	protected static final int REQUEST_DOWNING  = 105;
+	protected static final int REQUEST_PROJING  = 106;
+	protected static final int REQUEST_EDITING  = 107;
+	protected static final int REQUEST_DTXING = 108;
+	protected static final int REQUEST_ZSOLOZSMA = 109;
 	
 	private void doMenuLoad() {
 		if (G.OPEN_DIA_BY_FILESELECTOR) {
@@ -82,7 +86,12 @@ public class MainMenu extends FragmentActivity
 		it.putExtra(DiaLoader.itFNAME,fname);
 		startActivityForResult(it,REQUEST_LOADING);
 	}
-	
+
+	private void doMenuZsolozsma() {
+		Intent it = new Intent(this,ZsolActivity.class);
+		startActivityForResult(it,REQUEST_ZSOLOZSMA);
+	}
+
 	private void doMenuNet() {
 		Intent it = new Intent(this,SetNet.class);
 		startActivityForResult(it,REQUEST_NETING);
@@ -144,7 +153,11 @@ public class MainMenu extends FragmentActivity
 		boolean ok = (resultCode==RESULT_OK);
 		whenLoaded(ok, ok ? data.getStringExtra(DiaLoader.itFNAME) : "");
 	}
-	
+
+	private void reqZsolozsma(int resultCode, Intent data) {
+		if (resultCode==RESULT_OK) whenZsolozsma();
+	}
+
 	private void reqNeting(int resultCode, Intent data) {
 		if (resultCode==RESULT_OK) whenSetNeted();
 	}
@@ -169,19 +182,25 @@ public class MainMenu extends FragmentActivity
 	////////////////////
 	// hivo rurinok
 	////////////////////
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inf = getMenuInflater();
 		inf.inflate(R.menu.mainmenu,menu);
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		MenuItem m;
 		//m=menu.findItem(R.id.mnEdit);
 		//m.setEnabled(false);
 		m=menu.findItem(R.id.mnSave);
-		m.setEnabled(false);
+		//m.setEnabled(G.sDiaFname!=null && !G.sDiaFname.isEmpty());
+		m.setVisible(false);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -194,6 +213,9 @@ public class MainMenu extends FragmentActivity
 				return true;
 			case R.id.mnSave:
 				onMenuSave();
+				return true;
+			case R.id.mnZsolozsma:
+				onMenuZsolozsma();
 				return true;
 			case R.id.mnSetDownload:
 				onMenuSetDownload();
@@ -234,5 +256,6 @@ public class MainMenu extends FragmentActivity
 		if (requestCode==REQUEST_PROJING) reqProjing(resultCode,data);
 		if (requestCode==REQUEST_EDITING) reqEditing(resultCode,data);
 		if (requestCode==REQUEST_DTXING) reqDtxing(resultCode,data);
+		if (requestCode==REQUEST_ZSOLOZSMA) reqZsolozsma(resultCode,data);
 	}
 }

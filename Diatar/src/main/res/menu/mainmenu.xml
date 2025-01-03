@@ -10,7 +10,12 @@
     <item
         android:id="@+id/mnSave"
         android:title="Ment"/>
-    <item
+	<item
+		android:id="@+id/mnZsolozsma"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:title="Zsolozsma" />
+	<item
         android:id="@+id/mnSets"
         android:title="Beállít">
 		<menu>
