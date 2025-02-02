@@ -1,6 +1,10 @@
 package diatar.eu;
 import android.app.*;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.*;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.widget.*;
 import android.view.*;
 import android.content.*;
@@ -10,6 +14,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+import java.net.URI;
 import java.util.*;
 
 public class EditActivity extends Activity
@@ -107,9 +113,15 @@ public class EditActivity extends Activity
 			startActivityForResult(it,REQUEST_ADD_SEP);
 			return true;
 		case R.id.mnEdAddPic:
-			it = new Intent(this, FileSelectorActivity.class);
-			it.putExtra(G.idDIR,G.sPicDir);
-			it.putExtra(G.idFTYPE,FileSelectorActivity.ftPIC);
+			if (G.OPEN_PIC_BY_FILESELECTOR) {
+				it = new Intent(this, FileSelectorActivity.class);
+				it.putExtra(G.idDIR, G.sPicDir);
+				it.putExtra(G.idFTYPE, FileSelectorActivity.ftPIC);
+			} else {
+				it = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+				it.addCategory(Intent.CATEGORY_OPENABLE);
+				it.setType("image/*");
+			}
 			startActivityForResult(it,REQUEST_ADD_PIC);
 			return true;
 		case R.id.mnEdLongDel:
@@ -233,18 +245,30 @@ public class EditActivity extends Activity
 	
 	private void reqAddPic(int resultCode, Intent data) {
 		if (resultCode!=RESULT_OK) return;
-		String fn = data.getStringExtra(G.idFNAME);
-		if (fn.isEmpty()) return;
-		String dn = data.getStringExtra(G.idDIR);
-		if (dn.isEmpty()) return;
+		String fn,dn;
+		if (G.OPEN_PIC_BY_FILESELECTOR) {
+			fn = data.getStringExtra(G.idFNAME);
+			if (fn.isEmpty()) return;
+			dn = data.getStringExtra(G.idDIR);
+			if (dn.isEmpty()) return;
+		} else {
+			if (data==null) return;
+			Uri uri = data.getData();
+			final int takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+			getContentResolver().takePersistableUriPermission(uri, takeFlags);
+			fn = uri.toString();
+			dn = "";
+		}
 		DiaItem dact = DiaItem.getByPos(actitem);
 		DiaItem dnew = new DiaItem(DiaItem.ditPIC);
 		dnew.mKnev=dn; dnew.mVnev=fn;
 		dnew.InsertMe(dact);
 		mLstAdapter.notifyDataSetChanged();
 		mLst.invalidate();
-		G.sPicDir=dn;
-		G.Save(this);
+		if (!dn.isEmpty()) {
+			G.sPicDir=dn;
+			G.Save(this);
+		}
 	}
 	
 	private void reqEdPic(int resultCode, Intent data) {
@@ -353,11 +377,14 @@ public class EditActivity extends Activity
 			return;
 		}
 		if (d.mTipus==d.ditPIC) {
-			Intent it = new Intent(this,FileSelectorActivity.class);
-			it.putExtra(G.idDIR,d.mKnev);
-			it.putExtra(G.idFTYPE,FileSelectorActivity.ftPIC);
-			it.putExtra(G.idFNAME,d.mVnev);
-			it.putExtra(G.idINDEX,p);
+			Intent it;
+			/* if (G.OPEN_PIC_BY_FILESELECTOR)*/ {
+				it = new Intent(this, FileSelectorActivity.class);
+				it.putExtra(G.idDIR, d.mKnev);
+				it.putExtra(G.idFTYPE, FileSelectorActivity.ftPIC);
+				it.putExtra(G.idFNAME, d.mVnev);
+				it.putExtra(G.idINDEX, p);
+			}
 			startActivityForResult(it,REQUEST_ED_PIC);
 			return;
 		}

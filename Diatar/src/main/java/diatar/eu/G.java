@@ -10,6 +10,7 @@ import java.io.*;
 public class G  //globals
 {
 	public static final boolean OPEN_DIA_BY_FILESELECTOR = false;
+	public static final boolean OPEN_PIC_BY_FILESELECTOR = false;
 
 	public static final String idBKCOLOR = "BkColor";
 	public static final String idTXCOLOR = "ForeColor";

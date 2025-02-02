@@ -147,9 +147,14 @@ class DI_Loader extends AsyncTask<DiaLoader,String,String> {
 		s=ReadStr("kep","");
 		if (!s.isEmpty()) {
 			DiaItem d = new DiaItem(DiaItem.ditPIC);
-			File f = new File(s);
-			d.mKnev=f.getParent()+f.separator;
-			d.mVnev=f.getName();
+			if (s.contains(":")) {
+				d.mKnev="";
+				d.mVnev=s;
+			} else {
+				File f = new File(s);
+				d.mKnev = f.getParent() + f.separator;
+				d.mVnev = f.getName();
+			}
 			return d;
 		}
 		k=ReadStr("kotet","");

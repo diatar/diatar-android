@@ -1,6 +1,9 @@
 package diatar.eu;
 
+import android.content.Context;
 import android.graphics.*;
+import android.net.Uri;
+
 import java.io.*;
 
 public class MainPicView extends DiaViewBase
@@ -11,11 +14,15 @@ public class MainPicView extends DiaViewBase
 	public MainPicView(MainActivity ma, String fname) {
 		super(ma);
 		mFname=fname;
+		loadBmp(ma,fname);
 	}
 
-	public void loadBmp(String fname) {
+	public void loadBmp(Context ctx, String fname) {
 		try {
-			mBmp = BitmapFactory.decodeStream(new FileInputStream(fname));
+			if (fname.contains(":"))
+				mBmp = BitmapFactory.decodeStream(ctx.getContentResolver().openInputStream(Uri.parse(fname)));
+			else
+				mBmp = BitmapFactory.decodeStream(new FileInputStream(fname));
 		} catch (Exception e) {
 			mBmp=null;
 		}
