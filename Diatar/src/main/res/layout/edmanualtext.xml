@@ -13,11 +13,11 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:labelFor="@id/edManualTextCim"
+			android:labelFor="@id/emtCim"
 			android:text="Cím:" />
 
 		<EditText
-			android:id="@+id/edManualTextCim"
+			android:id="@+id/emtCim"
 			android:layout_width="0dp"
 			android:layout_height="wrap_content"
 			android:layout_weight="1"
@@ -25,11 +25,92 @@
 			android:inputType="text" />
 	</LinearLayout>
 
-	<EditText
-		android:id="@+id/edManualTextSzoveg"
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal">
+
+		<ToggleButton
+			android:id="@+id/emtBoldBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="B"
+			android:textOff="B"
+			android:textOn="B"
+			android:textStyle="bold" />
+
+		<ToggleButton
+			android:id="@+id/emtItalicBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="I"
+			android:textOff="I"
+			android:textOn="I"
+			android:textStyle="italic" />
+
+		<ToggleButton
+			android:id="@+id/emtUnderlineBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="U"
+			android:textOff="U"
+			android:textOn="U" />
+
+		<ToggleButton
+			android:id="@+id/emtStrikeBtn"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_weight="1"
+			android:text="S"
+			android:textOff="S"
+			android:textOn="S" />
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_weight="1"
+		android:orientation="horizontal">
+
+		<Button
+			android:id="@+id/emtSoftHyphen"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="-" />
+
+		<Button
+			android:id="@+id/emtNBHyphen"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="=" />
+
+		<Button
+			android:id="@+id/emtNBSpace"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="_" />
+
+		<Button
+			android:id="@+id/emtBreak"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="|" />
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"></LinearLayout>
+
+	<diatar.eu.EditDiaText
+		android:id="@+id/emtSzoveg"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:ems="10"
+		android:ems="14"
 		android:gravity="start|top"
 		android:hint="Dia szövege..."
 		android:inputType="text|textAutoCorrect|textMultiLine"
