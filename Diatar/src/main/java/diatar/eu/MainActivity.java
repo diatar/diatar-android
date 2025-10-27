@@ -72,7 +72,10 @@ public class MainActivity extends MainMenu
 		mainPagerBg.setBackgroundColor(G.sBkColor);
 		
 		FillGrpLst();
-		
+
+		MqttInterface ul = new MqttInterface();
+		ul.fillUserList();
+
 		posDtx=0; G.sDiaFname=""; mCurrDtx=DtxPos2Idx(0);
 		if (savedInstanceState!=null)
 			loadState(savedInstanceState);
@@ -379,7 +382,6 @@ public class MainActivity extends MainMenu
 			for (Integer ix : g.DtxLst)
 				xlst.add("    "+dtxarr[ix].title());
 		}
-		//if (xlst.
 		ArrayAdapter<String> adp = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,xlst);
 		DtxLst.setAdapter(adp);
 		DtxIdx=-2; PageIdx=-2;
