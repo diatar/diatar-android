@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-	xmlns:android="http://schemas.android.com/apk/res/android"
-	android:layout_height="match_parent"
-	android:layout_width="match_parent">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
 
 	<LinearLayout
 		android:layout_width="fill_parent"
@@ -10,80 +10,155 @@
 		android:orientation="vertical">
 
 		<LinearLayout
-			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:orientation="vertical">
 
 			<TextView
-				android:layout_height="wrap_content"
-				android:text="Diatár Vetítő"
-				android:textAppearance="?android:attr/textAppearanceLarge"
 				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="#4BEF96"
+				android:elevation="10dp"
 				android:gravity="center_horizontal"
-				android:typeface="serif"
+				android:paddingTop="10dp"
 				android:shadowColor="#835559"
-				android:textColor="#434ECE"
 				android:shadowDx="3.0"
 				android:shadowDy="3.0"
+				android:shadowRadius="1.0"
+				android:text="Diatár Vetítő"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:textColor="#434ECE"
 				android:textStyle="bold|italic"
-				android:background="#4BEF96"
-				android:paddingTop="10dp"
-				android:elevation="10dp"
-				android:shadowRadius="1.0"/>
+				android:typeface="serif" />
 
 			<TextView
+				android:id="@+id/VerTxt"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
+				android:background="#4BEF96"
+				android:gravity="center_horizontal"
 				android:text="ver"
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:layout_width="match_parent"
-				android:background="#4BEF96"
-				android:gravity="center_horizontal"
-				android:id="@+id/VerTxt"/>
+				android:textAppearance="?android:attr/textAppearanceSmall" />
 
 			<TextView
-				android:layout_height="wrap_content"
-				android:text="Androidos segédprogram távoli vetítéshez"
 				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
 				android:layout_gravity="center_horizontal"
-				android:gravity="center_horizontal"
 				android:background="#4BEF96"
-				android:paddingBottom="10dp"/>
+				android:gravity="center_horizontal"
+				android:paddingBottom="10dp"
+				android:text="Androidos segédprogram távoli vetítéshez" />
 
 			<View
+				android:layout_width="match_parent"
 				android:layout_height="1dp"
-				android:background="?android:attr/dividerVertical"
-				android:layout_width="match_parent"/>
-
-		</LinearLayout>
-
-		<TextView
-			android:layout_height="wrap_content"
-			android:text="IP"
-			android:layout_width="match_parent"
-			android:id="@+id/IpTxt"
-			android:gravity="center_horizontal"/>
-
-		<LinearLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:orientation="horizontal">
+				android:background="?android:attr/dividerVertical" />
 
 			<TextView
+				android:id="@+id/IpTxt"
+				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:text="Port:"
-				android:layout_width="wrap_content"
-				android:layout_gravity="center_vertical"
-				android:gravity="center_horizontal"/>
-
-			<EditText
-				android:layout_height="wrap_content"
-				android:inputType="number"
-				android:ems="10"
-				android:layout_width="wrap_content"
-				android:id="@+id/PortEd"
-				android:gravity="center_horizontal"/>
+				android:gravity="center_horizontal" />
 
 		</LinearLayout>
+
+		<androidx.gridlayout.widget.GridLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:alignmentMode="alignBounds"
+			app:columnCount="3"
+			app:columnOrderPreserved="false"
+			app:useDefaultMargins="true">
+
+			<RadioButton
+				android:id="@+id/IPmode"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:onClick="onMode"
+				android:text="IP"
+				app:layout_column="0"
+				app:layout_row="0" />
+
+			<TextView
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Port:"
+				app:layout_column="1"
+				app:layout_gravity="right|center_vertical"
+				app:layout_row="0" />
+
+			<EditText
+				android:id="@+id/PortEd"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:ems="10"
+				android:gravity="center_horizontal"
+				android:inputType="number"
+				app:layout_column="2"
+				app:layout_columnWeight="1"
+				app:layout_row="0" />
+
+			<RadioButton
+				android:id="@+id/MQTTmode"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:onClick="onMode"
+				android:text="Internet"
+				app:layout_column="0"
+				app:layout_row="1" />
+
+			<TextView
+				android:id="@+id/textView3"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Küldő:"
+				app:layout_column="1"
+				app:layout_gravity="right|center_vertical"
+				app:layout_row="1" />
+
+			<EditText
+				android:id="@+id/SenderEd"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:ems="10"
+				android:gravity="center_horizontal"
+				android:inputType="text"
+				app:layout_columnWeight="1"
+				app:layout_column="2"
+				app:layout_row="1" />
+
+			<androidx.recyclerview.widget.RecyclerView
+				android:id="@+id/SenderLst"
+				android:layout_width="0dp"
+				android:layout_height="129dp"
+				app:layout_columnWeight="1"
+				app:layout_column="2"
+				app:layout_row="2" />
+
+			<TextView
+				android:id="@+id/textView2"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:text="Csatorna:"
+				app:layout_column="1"
+				app:layout_gravity="right|center_vertical"
+				app:layout_row="3" />
+
+			<Spinner
+				android:id="@+id/ChannelLst"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				app:layout_columnWeight="1"
+				app:layout_column="2"
+				app:layout_row="3" />
+		</androidx.gridlayout.widget.GridLayout>
+
+		<View
+			android:id="@+id/divider"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="?android:attr/listDivider" />
 
 		<LinearLayout
 			android:layout_width="match_parent"
@@ -109,128 +184,128 @@
 
 		<GridLayout
 			columnCount="1"
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
 			rowCount="1"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:columnCount="4"
 			android:rowCount="3">
 
 			<TextView
-				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="Bal:"
+				android:layout_height="wrap_content"
+				android:layout_row="0"
 				android:layout_column="0"
-				android:layout_row="0"
-				android:layout_gravity="right|center_vertical"/>
+				android:layout_gravity="right|center_vertical"
+				android:text="Bal:" />
 
 			<EditText
-				android:inputType="numberDecimal"
+				android:id="@+id/ClipL"
 				android:layout_width="wrap_content"
-				android:ems="5"
 				android:layout_height="wrap_content"
+				android:layout_row="0"
 				android:layout_column="1"
-				android:layout_row="0"
-				android:id="@+id/ClipL"/>
+				android:ems="5"
+				android:inputType="numberDecimal" />
 
 			<TextView
-				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="Jobb:"
-				android:layout_column="2"
+				android:layout_height="wrap_content"
 				android:layout_row="0"
-				android:layout_gravity="right|center_vertical"/>
+				android:layout_column="2"
+				android:layout_gravity="right|center_vertical"
+				android:text="Jobb:" />
 
 			<EditText
-				android:inputType="numberDecimal"
+				android:id="@+id/ClipR"
 				android:layout_width="wrap_content"
-				android:ems="5"
 				android:layout_height="wrap_content"
-				android:id="@+id/ClipR"/>
+				android:ems="5"
+				android:inputType="numberDecimal" />
 
 			<TextView
-				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="Felső:"
+				android:layout_height="wrap_content"
+				android:layout_row="1"
 				android:layout_column="0"
-				android:layout_row="1"
-				android:layout_gravity="right|center_vertical"/>
+				android:layout_gravity="right|center_vertical"
+				android:text="Felső:" />
 
 			<EditText
-				android:inputType="numberDecimal"
+				android:id="@+id/ClipT"
 				android:layout_width="wrap_content"
-				android:ems="5"
 				android:layout_height="wrap_content"
 				android:layout_row="1"
 				android:layout_column="1"
-				android:id="@+id/ClipT"/>
+				android:ems="5"
+				android:inputType="numberDecimal" />
 
 			<TextView
-				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="Alsó:"
+				android:layout_height="wrap_content"
 				android:layout_row="1"
 				android:layout_column="2"
-				android:layout_gravity="right|center_vertical"/>
+				android:layout_gravity="right|center_vertical"
+				android:text="Alsó:" />
 
 			<EditText
-				android:inputType="numberDecimal"
+				android:id="@+id/ClipB"
 				android:layout_width="wrap_content"
-				android:ems="5"
 				android:layout_height="wrap_content"
 				android:layout_row="1"
 				android:layout_column="3"
-				android:id="@+id/ClipB"/>
+				android:ems="5"
+				android:inputType="numberDecimal" />
 
 			<CheckBox
+				android:id="@+id/MirrorCb"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:layout_row="2"
 				android:layout_column="0"
 				android:layout_columnSpan="2"
-				android:text="Tükrözés"
 				android:layout_gravity="center_vertical|center_horizontal"
-				android:id="@+id/MirrorCb"/>
+				android:text="Tükrözés" />
 
 			<TextView
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:text="Forgatás:"
-				android:layout_column="2"
 				android:layout_row="2"
-				android:layout_gravity="right|center_vertical"/>
+				android:layout_column="2"
+				android:layout_gravity="right|center_vertical"
+				android:text="Forgatás:" />
 
 			<Spinner
+				android:id="@+id/RotLst"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:entries="@array/setrotate"
-				android:id="@+id/RotLst"/>
+				android:entries="@array/setrotate" />
 
 		</GridLayout>
 
 		<View
-			android:background="?android:attr/dividerVertical"
 			android:layout_width="match_parent"
-			android:layout_height="1dp"/>
+			android:layout_height="1dp"
+			android:background="?android:attr/dividerVertical" />
 
 		<CheckBox
-			android:layout_height="wrap_content"
+			android:id="@+id/BootCk"
 			android:layout_width="wrap_content"
-			android:text="Automatikus indítás bekapcsoláskor"
-			android:id="@+id/BootCk"/>
+			android:layout_height="wrap_content"
+			android:text="Automatikus indítás bekapcsoláskor" />
 
 		<LinearLayout
-			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:orientation="horizontal">
 
 			<Button
-				android:layout_height="wrap_content"
-				style="?android:attr/buttonStyleSmall"
-				android:text="Kilép"
-				android:layout_width="wrap_content"
 				android:id="@+id/btnStop"
+				style="?android:attr/buttonStyleSmall"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
 				android:layout_weight="1.0"
-				android:onClick="onExit"/>
+				android:onClick="onExit"
+				android:text="Kilép" />
 
 			<Button
 				android:id="@+id/btnShutdown"
@@ -262,26 +337,26 @@
 			android:text="(Figyelem! A leállítás és újraindítás védett funkció, csak Root-olt készüléken elképzelhető)" />
 
 		<LinearLayout
-			android:layout_height="wrap_content"
 			style="?android:attr/buttonBarStyle"
 			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
 			android:orientation="horizontal">
 
 			<Button
-				android:layout_height="wrap_content"
 				style="?android:attr/buttonBarButtonStyle"
-				android:text="Mégse"
 				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
 				android:layout_weight="1.0"
-				android:onClick="onCancel"/>
+				android:onClick="onCancel"
+				android:text="Mégse" />
 
 			<Button
-				android:layout_height="wrap_content"
 				style="?android:attr/buttonBarButtonStyle"
-				android:text="Ok"
 				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
 				android:layout_weight="1.0"
-				android:onClick="onOk"/>
+				android:onClick="onOk"
+				android:text="Ok" />
 
 		</LinearLayout>
 

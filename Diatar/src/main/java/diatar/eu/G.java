@@ -6,6 +6,9 @@ import android.widget.*;
 import android.graphics.drawable.*;
 import eu.diatar.library.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class G  //globals
 {
@@ -71,6 +74,10 @@ public class G  //globals
 	public static final String idDELETABLE = "Deletable";
 	public static final String idFDATE = "FDate";
 
+	public static final String idUSER = "User";
+	public static final String idPSW = "Psw";
+	public static final String idCHANNEL = "Channel";
+
 	
 	public static int sBkColor, sTxColor, sBlankColor,sHighColor;
 	public static int sFontSize, sTitleSize;
@@ -100,6 +107,8 @@ public class G  //globals
 	public static Uri sLoadUri;
 	
 	public static boolean sAlwaysOn;
+
+	public static String sUser, sPsw, sChannel;
 	
 	public static void setIpCnt(int newval) {
 		if (newval<0) newval=0;
@@ -150,6 +159,9 @@ public class G  //globals
 		sBorderR=sp.getInt(idBORDERR, 0);
 		sBorderB=sp.getInt(idBORDERB, 0);
 		sBoldText=sp.getBoolean(idBOLDTEXT,false);
+		sUser=sp.getString(idUSER,"");
+		sPsw=sp.getString(idPSW,"");
+		sChannel=sp.getString(idCHANNEL,"");
 	}
 	
 	public static void Save(Context mainctx) {
@@ -192,6 +204,9 @@ public class G  //globals
 		spe.putInt(idBORDERR, sBorderR);
 		spe.putInt(idBORDERB, sBorderB);
 		spe.putBoolean(idBOLDTEXT,sBoldText);
+		spe.putString(idUSER,sUser);
+		spe.putString(idPSW,sPsw);
+		spe.putString(idCHANNEL,sChannel);
 		
 		spe.apply();
 	}
@@ -229,4 +244,5 @@ public class G  //globals
 		if (fn.isDirectory()) return "";
 		return fn.getName();
 	}
+
 }

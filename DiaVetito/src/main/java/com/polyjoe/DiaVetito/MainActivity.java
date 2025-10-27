@@ -14,9 +14,6 @@ import eu.diatar.library.*;
 
 public class MainActivity extends Activity 
 {
-	//public static final String VerStr = "v1.2";
-	//public static final String VerTxt = "Verzió: "+VerStr;
-	
 	//shared pref
 	public static final String spPORT ="Port";
 	public static final String spBOOT ="Boot";
@@ -27,9 +24,12 @@ public class MainActivity extends Activity
 	public static final String spCLIPB ="ClipB";
 	public static final String spMIRROR = "Mirror";
 	public static final String spROTATE = "Rotate";
+	public static final String spUSER = "Username";
+	public static final String spCHANNEL = "Channel";
 	
 	private ProjectedView mProjView;
 	private TcpServer mTcp;
+	private MqttInterface mMqtt;
 	public int TcpPort;
 	public boolean mBoot;
 	
@@ -46,6 +46,12 @@ public class MainActivity extends Activity
 			WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		TxtSizer.setDensity(this);
+		mMqtt = MqttInterface.getInstance();
+		mMqtt.setErrCallback(txt -> Err(txt));
+		mMqtt.setRecBlankCallback(recBlank -> OnBlank(recBlank));
+		mMqtt.setRecPicCallback(recPic -> OnPic(recPic));
+		mMqtt.setRecTextCallback(recText -> OnText(recText));
+		mMqtt.setRecStateCallback(recState -> OnState(recState));
 		mTcp = TcpServer.get(this);
 		mTcp.density = getResources().getDisplayMetrics().density;
 		LoadConfig();
@@ -76,6 +82,8 @@ public class MainActivity extends Activity
 		mTcp.Stop();
 		mTcp.clearMain();
 		mTcp=null;
+		mMqtt.Destroy();
+		mMqtt=null;
 		super.onDestroy();
 	}
 	
@@ -90,6 +98,11 @@ public class MainActivity extends Activity
 		mTcp.ClipBdp=sp.getFloat(spCLIPB,0f);
 		mTcp.mMirror=sp.getBoolean(spMIRROR,false);
 		mTcp.mRotate=sp.getInt(spROTATE,0);
+
+		mMqtt.Username=sp.getString(spUSER,"");
+		mMqtt.Channel=sp.getString(spCHANNEL,"");
+		if (!mMqtt.Username.isEmpty() && !mMqtt.Channel.isEmpty())
+			mMqtt.openReceiver();
 	}
 	
 	private void SaveConfig() {
@@ -104,6 +117,8 @@ public class MainActivity extends Activity
 		spe.putFloat(spCLIPB,mTcp.ClipBdp);
 		spe.putBoolean(spMIRROR,mTcp.mMirror);
 		spe.putInt(spROTATE,mTcp.mRotate);
+		spe.putString(spUSER,mMqtt.Username);
+		spe.putString(spCHANNEL,mMqtt.Channel);
 		spe.commit();
 	}
 	
@@ -220,6 +235,8 @@ public class MainActivity extends Activity
 		it.putExtra(SettingsActivity.itMIRROR,mTcp.mMirror);
 		it.putExtra(SettingsActivity.itROTATE,mTcp.mRotate);
 		it.putExtra(SettingsActivity.itBOOT,mBoot);
+		it.putExtra(SettingsActivity.itUSER,mMqtt.Username);
+		it.putExtra(SettingsActivity.itCHANNEL,mMqtt.Channel);
 		startActivityForResult(it,REQUEST_SETTINGS);
 	}
 	
@@ -236,6 +253,10 @@ public class MainActivity extends Activity
 			mTcp.mMirror=data.getBooleanExtra(SettingsActivity.itMIRROR,false);
 			mTcp.mRotate=data.getIntExtra(SettingsActivity.itROTATE,0);
 			convertClipDpToPx();
+			mMqtt.Username=data.getStringExtra(SettingsActivity.itUSER);
+			mMqtt.Channel=data.getStringExtra(SettingsActivity.itCHANNEL);
+			mMqtt.openReceiver();
+
 			SaveConfig();
 			mProjView.Recalc();
 			mProjView.invalidate();
@@ -245,6 +266,8 @@ public class MainActivity extends Activity
 			shutdownOS();
 		} else if (resultCode==SettingsActivity.RESULT_REBOOT) {
 			restartOS();
+		} else {
+			mMqtt.openReceiver();
 		}
 	}
 	
