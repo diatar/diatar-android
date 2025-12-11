@@ -371,7 +371,17 @@ public class DiaItem {
 		v&=0x00FFFFFF;
 		res=res || v!=r.getTxtColor();
 		r.setTxtColor(v);
-		
+
+		v=G.sHighColor;
+		if (d!=null) {
+			v=d.mProps.mHiColor;
+			if ((v&0xFF000000)==0) v=sCommonProps.mHiColor;
+			if ((v&0xFF000000)==0) v=G.sHighColor;
+		}
+		v&=0x00FFFFFF;
+		res=res || v!=r.getHiColor();
+		r.setHiColor(v);
+
 		v=G.sBlankColor;
 		if (d!=null) {
 			v=d.mProps.mBlankColor;

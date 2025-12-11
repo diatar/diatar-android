@@ -11,9 +11,6 @@ import android.content.*;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.chip.Chip;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.diatar.library.MqttInterface;
@@ -47,7 +44,7 @@ public class SettingsActivity extends Activity
 	private CheckBox mC2BCk;
 	private RadioButton mIpBtn, mMqttBtn;
 	private RecyclerView mSenderLst;
-	private Spinner mChannelLst;
+	//private Spinner mChannelLst;
 	private StringListAdapter mSenderLstAdapter;
 	private ArrayAdapter<String> mChannelLstAdapter;
 	private String mUsername, mChannel;
@@ -67,7 +64,7 @@ public class SettingsActivity extends Activity
 		PortEd = findViewById(R.id.PortEd);
 		SenderEd = findViewById(R.id.SenderEd);
 		mSenderLst = findViewById(R.id.SenderLst);
-		mChannelLst = findViewById(R.id.ChannelLst);
+		//mChannelLst = findViewById(R.id.ChannelLst);
 		mC2BCk = findViewById(R.id.B2CCk);
 		LEd = findViewById(R.id.ClipL);
 		REd = findViewById(R.id.ClipR);
@@ -91,7 +88,7 @@ public class SettingsActivity extends Activity
 			@Override
 			public void afterTextChanged(Editable editable)
 			{
-				modeSet(false);
+				modeSet(editable.length()<=0);
 				fillSenderLst();
 			}
 			@Override
@@ -105,7 +102,7 @@ public class SettingsActivity extends Activity
 		mSenderLst.setAdapter(mSenderLstAdapter);
 		mChannelLstAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
 		mChannelLstAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		mChannelLst.setAdapter(mChannelLstAdapter);
+		//mChannelLst.setAdapter(mChannelLstAdapter);
 		fillChannelLst();
 
 		Intent it = getIntent();
@@ -139,7 +136,7 @@ public class SettingsActivity extends Activity
 			mChannel=it.getStringExtra(itCHANNEL);
 		}
 		SenderEd.setText(mUsername);
-		modeSet(mIpBtn.isChecked());
+		modeSet(mUsername.isEmpty());
 		B2Cset();
 
 		TextView vertv = findViewById(R.id.VerTxt);
@@ -167,16 +164,16 @@ public class SettingsActivity extends Activity
 		outState.putBoolean(itMIRROR,mMirror.isChecked());
 		outState.putInt(itROTATE,mRotate.getSelectedItemPosition());
 		outState.putBoolean(itBOOT,mBootCk.isChecked());
-		outState.putString(itUSER,SenderEd.getText().toString());
+		outState.putString(itUSER,mIpBtn.isChecked() ? "" : SenderEd.getText().toString());
 		outState.putString(itCHANNEL,mChannel.isEmpty() ? getCurrChannel() : mChannel);
 	}
 
 	protected String getCurrChannel() {
-		int idx = mChannelLst.getSelectedItemPosition();
+		int idx = 0; //mChannelLst.getSelectedItemPosition();
 		if (idx<0) return "";
 		String txt = mChannelLstAdapter.getItem(idx);
 		if (txt.length()<4) return "";
-		return txt.substring(3).trim();
+		return "1"; // txt.substring(3).trim();
 	}
 
 	protected void fillSenderLst() {
@@ -188,35 +185,37 @@ public class SettingsActivity extends Activity
 				mSenderLstAdapter.setSelection(idx);
 				fillChannelLst();
 			}
-			mUsername="";
+			//mUsername="";
 		}
 	}
 
 	protected void fillChannelLst() {
-		int idx=mChannelLst.getSelectedItemPosition();
-		String arr[] = new String[10];
-		for (int i=0; i<10; i++) {
-			arr[i]=String.valueOf(i+1)+".";
-		}
-		int sel = mSenderLstAdapter.getSelection();
-		if (sel!=RecyclerView.NO_POSITION) {
-			String uname = mSenderLstAdapter.getItem(sel);
-			MqttInterface.UserArray user = mMqtt.getUser(uname);
-			if (user!=null) {
-				for (int i=0; i<10; i++) {
-					String chname = user.Channels[i];
-					if (!mChannel.isEmpty() && chname.equals(mChannel)) {
-						idx=i;
-						mChannel="";
+		int idx=0; //mChannelLst.getSelectedItemPosition();
+		if (idx>0) {
+			String arr[] = new String[10];
+			for (int i = 0; i < 10; i++) {
+				arr[i] = String.valueOf(i + 1) + ".";
+			}
+			int sel = mSenderLstAdapter.getSelection();
+			if (sel != RecyclerView.NO_POSITION) {
+				String uname = mSenderLstAdapter.getItem(sel);
+				MqttInterface.UserArray user = mMqtt.getUser(uname);
+				if (user != null) {
+					for (int i = 0; i < 10; i++) {
+						String chname = user.Channels[i];
+						if (!mChannel.isEmpty() && chname.equals(mChannel)) {
+							idx = i;
+							mChannel = "";
+						}
+						arr[i] = String.valueOf(i + 1) + ". " + chname;
 					}
-					arr[i]=String.valueOf(i+1)+". "+chname;
 				}
 			}
+			mChannelLstAdapter.clear();
+			mChannelLstAdapter.addAll(arr);
+			mChannelLstAdapter.notifyDataSetChanged();
+			//mChannelLst.setSelection(idx);
 		}
-		mChannelLstAdapter.clear();
-		mChannelLstAdapter.addAll(arr);
-		mChannelLstAdapter.notifyDataSetChanged();
-		mChannelLst.setSelection(idx);
 	}
 
 	protected void onSenderLstClick(int pos) {
@@ -271,7 +270,7 @@ public class SettingsActivity extends Activity
 		it.putExtra(itMIRROR,mMirror.isChecked());
 		it.putExtra(itROTATE,mRotate.getSelectedItemPosition());
 		it.putExtra(itBOOT,mBootCk.isChecked());
-		it.putExtra(itUSER,mSenderLstAdapter.getSelectionString());
+		it.putExtra(itUSER,mIpBtn.isChecked() ? "" : mSenderLstAdapter.getSelectionString());
 		it.putExtra(itCHANNEL,mChannel.isEmpty() ? getCurrChannel() : mChannel);
 		setResult(RESULT_OK,it);
 		finish();

@@ -8,6 +8,7 @@ import android.view.*;
 import android.widget.AdapterView.*;
 import android.graphics.drawable.*;
 import java.util.*;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -28,6 +29,7 @@ public class MainActivity extends MainMenu
 	private ImageButton mShowBtn;
 	private ImageButton mPrevHBtn, mNextHBtn;
 	private LinearLayout mMainCtrl1, mMainCtrl2;
+	private Toolbar mToolbar;
 	
 	TcpClient mTcp;
 	//ujratolteshez
@@ -64,7 +66,10 @@ public class MainActivity extends MainMenu
 		mNextHBtn = findViewById(R.id.NextHBtn);
 		mMainCtrl1 = findViewById(R.id.MainControls1);
 		mMainCtrl2 = findViewById(R.id.MainControls2);
-		
+
+		mToolbar = findViewById(R.id.main_toolbar);
+		setSupportActionBar(mToolbar);
+
 		MPAdapter = new MainPagerAdapter(getSupportFragmentManager());
 		DiaPager.setPageMargin(2);
 		DiaPager.setPageMarginDrawable(new ColorDrawable(0xFFFFFFFF));
@@ -120,9 +125,22 @@ public class MainActivity extends MainMenu
 	}
 
 	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			View decor = getWindow().getDecorView();
+			decor.setSystemUiVisibility(
+					View.SYSTEM_UI_FLAG_FULLSCREEN
+							| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+							| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+			);
+		}
+	}
+
+	@Override
 	protected void onDestroy()
 	{
-		mTcp.Stop();
+		//mTcp.Stop();
 		mTcp.clearMain();
 		mTcp=null;
 		super.onDestroy();
@@ -461,6 +479,7 @@ public class MainActivity extends MainMenu
 		if (on==G.sIsFullScr) return;
 		G.sIsFullScr=on;
 		if (on) {
+			mToolbar.setVisibility(View.GONE);
 			mMainCtrl1.setVisibility(View.GONE);
 			mMainCtrl2.setVisibility(View.GONE);
 			if (Build.VERSION.SDK_INT < 16) {
@@ -468,7 +487,7 @@ public class MainActivity extends MainMenu
 									 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			} else {
 				View decorView = getWindow().getDecorView();
-				int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE
+				int uiOptions = View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 					// Set the content to appear under the system bars so that the
 					// content doesn't resize when the system bars hide and show.
 					//| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -477,6 +496,7 @@ public class MainActivity extends MainMenu
 					// Hide the nav bar and status bar
 					//| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 					| View.SYSTEM_UI_FLAG_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
 					;
 				decorView.setSystemUiVisibility(uiOptions);
 				// Remember that you should never show the action bar if the
@@ -485,6 +505,7 @@ public class MainActivity extends MainMenu
 				if (actionBar!=null) actionBar.hide();
 			}
 		} else {
+			mToolbar.setVisibility(View.VISIBLE);
 			mMainCtrl1.setVisibility(View.VISIBLE);
 			mMainCtrl2.setVisibility(View.VISIBLE);
 			if (Build.VERSION.SDK_INT < 16) {
@@ -498,6 +519,9 @@ public class MainActivity extends MainMenu
 					//View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 					//| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 					0 //View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_FULLSCREEN
+					| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 					;
 				decorView.setSystemUiVisibility(uiOptions);
 // Remember that you should never show the action bar if the

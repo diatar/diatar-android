@@ -52,6 +52,10 @@ public class DiaText extends DiaBase
 			mTxtSizes.gTxtColor=g.TxtColor;
 			needed=true;
 		}
+		if (mTxtSizes.gHighColor!=g.HiColor) {
+			mTxtSizes.gHighColor=g.HiColor;
+			needed=true;
+		}
 		if (mTxtSizes.gUseAkkord!=g.UseAkkord) {
 			mTxtSizes.gUseAkkord=g.UseAkkord;
 			needed=true;

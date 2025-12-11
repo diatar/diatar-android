@@ -26,8 +26,8 @@ public class TcpServer extends Thread
 	private volatile RecBase rectosend;
 	private volatile byte rtstype;
 	
-	private boolean running;
-	private MainActivity main;
+	private volatile boolean running;
+	private volatile MainActivity main;
 	
 	private RecHdr hdr;
 	private RecBase rec;
@@ -36,7 +36,7 @@ public class TcpServer extends Thread
 	
 	private TcpServer() {
 		G = new Globals();
-		portnum=1024;
+		portnum=-1;
 	}
 	
 	static public TcpServer get(MainActivity m) {
@@ -123,6 +123,7 @@ public class TcpServer extends Thread
 	static private String lasterr;
 	
 	private ServerSocket createServer() {
+		if (portnum<0) return null;
 		try {
 			ServerSocket res = new ServerSocket();
 			res.setReuseAddress(true);
@@ -144,6 +145,7 @@ public class TcpServer extends Thread
 		try {
 			return server.accept();
 		} catch (Exception e) {
+			if (server==null || server.isClosed()) return null;
 			Err("Error: "+e.getLocalizedMessage());
 			System.out.println("S: Accept error");
 			return null;
@@ -247,6 +249,10 @@ public class TcpServer extends Thread
 		do {
 			try {
 				if (server==null) {
+					if (portnum<0) {
+						sleep(100);
+						continue;
+					}
 					Log.d("TcpServer","Server...");
 					client=null;
 					server = createServer();
@@ -348,7 +354,10 @@ public class TcpServer extends Thread
 		if (newval==portnum) return;
 		portnum=newval;
 		try {
-			if (server!=null) server.close();
+			if (server!=null) {
+				server.close();
+				while (!server.isClosed()) continue;
+			}
 		} catch(Exception e) {}
 		server=null;
 	}
