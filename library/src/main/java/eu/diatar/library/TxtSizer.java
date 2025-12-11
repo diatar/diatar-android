@@ -192,7 +192,7 @@ public class TxtSizer
 			wg=ln.mData.get(i);
 			for (int j=0; j<wg.mData.size(); j++) {
 				Word w = wg.mData.get(j);
-				p = w.getPaint(mFontSize,mWordIdx<mHighPoint ? gHighColor : gTxtColor,gBoldText);
+				p = w.getPaint(mFontSize,(mWordIdx<mHighPoint ? gHighColor : gTxtColor),gBoldText);
 				if (!w.txt.isEmpty()) anywr=true;
 				float xt=x0;
 				if (usekotta && !kstart) {

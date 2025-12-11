@@ -1,5 +1,6 @@
 package diatar.eu;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.*;
 
 import android.database.Cursor;
@@ -8,7 +9,7 @@ import android.provider.OpenableColumns;
 import android.view.*;
 import android.content.*;
 
-public class MainMenu extends FragmentActivity
+public class MainMenu extends AppCompatActivity //FragmentActivity
 {
 	////////////////////
 	// menu

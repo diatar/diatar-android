@@ -56,7 +56,6 @@ public class MainActivity extends Activity
 		mTcp.density = getResources().getDisplayMetrics().density;
 		LoadConfig();
 		convertClipDpToPx();
-		mTcp.setPort(TcpPort);
 
 		mProjView = new ProjectedView(this);
 		setContentView(mProjView);
@@ -79,7 +78,7 @@ public class MainActivity extends Activity
 	@Override
 	protected void onDestroy()
 	{
-		mTcp.Stop();
+		//mTcp.Stop();
 		mTcp.clearMain();
 		mTcp=null;
 		mMqtt.Destroy();
@@ -100,9 +99,9 @@ public class MainActivity extends Activity
 		mTcp.mRotate=sp.getInt(spROTATE,0);
 
 		mMqtt.Username=sp.getString(spUSER,"");
-		mMqtt.Channel=sp.getString(spCHANNEL,"");
-		if (!mMqtt.Username.isEmpty() && !mMqtt.Channel.isEmpty())
-			mMqtt.openReceiver();
+		mMqtt.Channel="1"; //sp.getString(spCHANNEL,"");
+		mMqtt.openReceiver();
+		mTcp.setPort(mMqtt.Username.isEmpty() ? TcpPort : -1);
 	}
 	
 	private void SaveConfig() {
@@ -119,7 +118,7 @@ public class MainActivity extends Activity
 		spe.putInt(spROTATE,mTcp.mRotate);
 		spe.putString(spUSER,mMqtt.Username);
 		spe.putString(spCHANNEL,mMqtt.Channel);
-		spe.commit();
+		spe.apply();
 	}
 	
 	public void convertClipDpToPx() {
@@ -244,7 +243,6 @@ public class MainActivity extends Activity
 		if (resultCode==RESULT_OK) {
 			TcpPort=data.getIntExtra(SettingsActivity.itPORT,1024);
 			mBoot=data.getBooleanExtra(SettingsActivity.itBOOT,false);
-			mTcp.setPort(TcpPort);
 			mTcp.G.Border2Clip=data.getBooleanExtra(SettingsActivity.itB2C, false);
 			mTcp.ClipLdp=data.getFloatExtra(SettingsActivity.itCLIPL,0f);
 			mTcp.ClipRdp=data.getFloatExtra(SettingsActivity.itCLIPR,0f);
@@ -256,6 +254,7 @@ public class MainActivity extends Activity
 			mMqtt.Username=data.getStringExtra(SettingsActivity.itUSER);
 			mMqtt.Channel=data.getStringExtra(SettingsActivity.itCHANNEL);
 			mMqtt.openReceiver();
+			mTcp.setPort(mMqtt.Username.isEmpty() ? TcpPort : -1);
 
 			SaveConfig();
 			mProjView.Recalc();

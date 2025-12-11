@@ -208,7 +208,7 @@ public class MqttInterface {
         if (jRoles != null) {
             for (int i = 0; i < jRoles.length(); i++) {
                 String rname = jRoles.optJSONObject(i).optString("rolename");
-                if (rname.equals("senders")) {
+                if (rname.startsWith("s-")) {
                     users[idx].SendersGroup=true;
                     break;
                 }
@@ -451,7 +451,35 @@ public class MqttInterface {
         isOpen=false;
     }
 
+    public void openSender() {
+        Channel="1";
+        if (Username.isEmpty() || Channel.isEmpty() || Password.isEmpty()) {
+            close();
+            return;
+        }
+        topicGroup="Diatar/"+Username+"/"+Channel+"/";
+        topicMask=topicGroup+"#";
+        topicState=topicGroup+"state";
+        topicBlank=topicGroup+"blank";
+        topicDia=topicGroup+"dia";
+        openMode=OpenMode.omSENDER;
+        isOpen=true;
+        ensureDisconnected().thenCompose(v ->
+                client.connectWith()
+                    .simpleAuth()
+                    .username("receiver")
+                    .password("receiverpsw".getBytes())
+                    .applySimpleAuth()
+                    .send()
+                    ).exceptionally(throwable -> {
+                        close();
+                        doOnError("Megnyitási hiba: "+throwable.getLocalizedMessage());
+                        return null;
+                    });
+    }
+
     public void openReceiver() {
+        Channel="1";
         if (Username.isEmpty() || Channel.isEmpty()) {
             close();
             return;
@@ -486,6 +514,63 @@ public class MqttInterface {
     public void fillUserList() {
         openMode=OpenMode.omUSERLIST;
         executeAdmin("{\"commands\": [{\"command\": \"listClients\"}]}");
+    }
+
+    //**************************************************************
+    // kuldo rutinok
+    //**************************************************************
+    public void sendState(RecState rec) {
+        if (!isOpen) return;
+        client.publishWith()
+            .topic(topicState)
+            .payload(rec.buf)
+            .send()
+            .exceptionally(throwable -> {
+                doOnError("Küldési hiba: "+throwable.getLocalizedMessage());
+                return null;
+            });
+    }
+
+    public void sendTxt(RecText rec) {
+        if (!isOpen) return;
+        byte[] sendbuf = new byte[1+rec.buf.length];
+        sendbuf[0]='T';
+        System.arraycopy(rec.buf, 0,sendbuf, 1, rec.buf.length);
+        client.publishWith()
+            .topic(topicDia)
+            .payload(sendbuf)
+            .send()
+            .exceptionally(throwable -> {
+                doOnError("Küldési hiba: "+throwable.getLocalizedMessage());
+                return null;
+            });
+    }
+
+    public void sendPic(RecPic rec) {
+        if (!isOpen) return;
+        byte[] sendbuf = new byte[1+rec.buf.length];
+        sendbuf[0]='P';
+        System.arraycopy(rec.buf, 0,sendbuf, 1, rec.buf.length);
+        client.publishWith()
+            .topic(topicDia)
+            .payload(sendbuf)
+            .send()
+            .exceptionally(throwable -> {
+                doOnError("Küldési hiba: "+throwable.getLocalizedMessage());
+                return null;
+            });
+    }
+
+    public void sendBlank(RecBlank rec) {
+        if (!isOpen || rec==null) return;
+        client.publishWith()
+            .topic(topicBlank)
+            .payload(rec.buf)
+            .send()
+            .exceptionally(throwable -> {
+                doOnError("Küldési hiba: "+throwable.getLocalizedMessage());
+                return null;
+            });
     }
 
     //**************************************************************
