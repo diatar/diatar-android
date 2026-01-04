@@ -9,10 +9,12 @@ import android.provider.OpenableColumns;
 import android.view.*;
 import android.content.*;
 
+import diatar.eu.net.TcpClient;
+
 public class MainMenu extends AppCompatActivity //FragmentActivity
 {
 	////////////////////
-	// menu
+	// menu koppintaskor - ezeket lehet override-olni
 	////////////////////
 	
 	protected void onMenuLoad() { doMenuLoad(); }
@@ -21,6 +23,8 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	protected void onMenuZsolozsma() { doMenuZsolozsma(); }
 	protected void onMenuSetDownload() { doMenuDown(); }
 	protected void onMenuSetNet() { doMenuNet(); }
+
+    protected void onMenuSetWeb() { doMenuWeb(); }
 	protected void onMenuSetProject() { doMenuProj(); }
 	protected void onMenuSetDtx() { doMenuDtx(); }
 	protected void onMenuSetAbout() { doMenuAbout(); }
@@ -29,7 +33,7 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	protected void onMenuExit() {}
 	
 	////////////////////
-	// vegrehajtas utan
+	// vegrehajtas utan - ezeket lehet override-olni
 	////////////////////
 	
 	protected void whenLoadSelected(String dir, String fname) {
@@ -44,6 +48,11 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	protected void whenLoaded(boolean success, String fname) {}
 	
 	protected void whenSetNeted() {}
+
+    protected void whenSetWebed(boolean ok) {
+        if (ok) G.Save(this);
+        TcpClient.getMe().Open();
+    }
 	
 	protected void whenSetDowned(boolean downloadnow ) {}
 	
@@ -56,17 +65,18 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	protected void whenSetDtxed(Intent data) {}
 	
 	////////////////////
-	// feldolgozas
+	// feldolgozas - default mukodes
 	////////////////////
 	
 	protected static final int REQUEST_FILELOAD = 101;
 	protected static final int REQUEST_LOADING = 102;
 	protected static final int REQUEST_NETING  = 104;
-	protected static final int REQUEST_DOWNING  = 105;
-	protected static final int REQUEST_PROJING  = 106;
-	protected static final int REQUEST_EDITING  = 107;
-	protected static final int REQUEST_DTXING = 108;
-	protected static final int REQUEST_ZSOLOZSMA = 109;
+    protected static final int REQUEST_WEBING  = 105;
+	protected static final int REQUEST_DOWNING  = 106;
+	protected static final int REQUEST_PROJING  = 107;
+	protected static final int REQUEST_EDITING  = 108;
+	protected static final int REQUEST_DTXING = 109;
+	protected static final int REQUEST_ZSOLOZSMA = 110;
 	
 	private void doMenuLoad() {
 		if (G.OPEN_DIA_BY_FILESELECTOR) {
@@ -98,6 +108,11 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 		startActivityForResult(it,REQUEST_NETING);
 	}
 
+    private void doMenuWeb() {
+        Intent it = new Intent(this,SetWeb.class);
+        startActivityForResult(it,REQUEST_WEBING);
+    }
+
 	private void doMenuDtx() {
 		Intent it = new Intent(this,SetDtx.class);
 		startActivityForResult(it,REQUEST_DTXING);
@@ -124,7 +139,7 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	}
 	
 	////////////////////
-	// requests
+	// requests - ide jutunk menu vegrehajtas utan
 	////////////////////
 	
 	private void reqFileload(int resultCode, Intent data) {
@@ -162,8 +177,12 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	private void reqNeting(int resultCode, Intent data) {
 		if (resultCode==RESULT_OK) whenSetNeted();
 	}
-	
-	private void reqDowning(int resultCode, Intent data) {
+
+    private void reqWebing(int resultCode, Intent data) {
+        if (resultCode==RESULT_OK) whenSetWebed(resultCode==RESULT_OK);
+    }
+
+    private void reqDowning(int resultCode, Intent data) {
 		if (resultCode==RESULT_CANCELED) return;
 		whenSetDowned(resultCode==RESULT_FIRST_USER);
 	}
@@ -224,6 +243,9 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 			case R.id.mnSetNet:
 				onMenuSetNet();
 				return true;
+            case R.id.mnSetWeb:
+                onMenuSetWeb();
+                return true;
 			case R.id.mnSetProject:
 				onMenuSetProject();
 				return true;
@@ -253,6 +275,7 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 		if (requestCode==REQUEST_FILELOAD) reqFileload(resultCode, data);
 		if (requestCode==REQUEST_LOADING) reqLoading(resultCode,data);
 		if (requestCode==REQUEST_NETING) reqNeting(resultCode,data);
+        if (requestCode==REQUEST_WEBING) reqWebing(resultCode,data);
 		if (requestCode==REQUEST_DOWNING) reqDowning(resultCode,data);
 		if (requestCode==REQUEST_PROJING) reqProjing(resultCode,data);
 		if (requestCode==REQUEST_EDITING) reqEditing(resultCode,data);

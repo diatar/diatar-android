@@ -27,10 +27,13 @@
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
 				android:title="Énektárak..." />
-			<item
-				android:id="@+id/mnSetNet"
-				android:title="Hálózat..."/>
-			<item
+            <item
+                android:id="@+id/mnSetNet"
+                android:title="Helyi hálózat..." />
+            <item
+                android:id="@+id/mnSetWeb"
+                android:title="Internet..." />
+            <item
 				android:id="@+id/mnSetProject"
 				android:title="Vetítés..."/>
 			<item

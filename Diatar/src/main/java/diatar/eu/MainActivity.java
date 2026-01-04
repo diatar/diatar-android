@@ -79,7 +79,7 @@ public class MainActivity extends MainMenu
 		FillGrpLst();
 
 		MqttInterface ul = new MqttInterface();
-		ul.fillUserList();
+		//ul.fillUserList();
 
 		posDtx=0; G.sDiaFname=""; mCurrDtx=DtxPos2Idx(0);
 		if (savedInstanceState!=null)

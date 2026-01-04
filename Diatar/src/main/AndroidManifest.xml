@@ -86,6 +86,11 @@
 			android:theme="@android:style/Theme.Holo.Light.Dialog" 
 		>
 		</activity>
+        <activity
+            android:name=".SetWeb"
+            android:theme="@android:style/Theme.Holo.Light.Dialog"
+            >
+        </activity>
 		<activity
 			android:name=".SetDtx"
 			android:theme="@android:style/Theme.Holo.Light.Dialog"

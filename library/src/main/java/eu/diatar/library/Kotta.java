@@ -1168,7 +1168,7 @@ public class Kotta
 						fX[4],fY[4],	//kozep bal irany
 						fX[2],fY[2]);	//kozep
 		} else {
-			pt.moveTo(fX[2],fY[3]);		//kozep
+			pt.moveTo(fX[2],fY[2]);		//kozep
 		}
 		//kozepponttol
 		if (vanvege) {
@@ -1198,7 +1198,16 @@ public class Kotta
 		mCanvas.drawPath(pt,mPaint);
 		
 		//kotoiv vege
-		mState.IvTipus=' '; mState.IvTipusLesz=' ';
+        if (vanvege) {
+            mState.IvTipus = ' ';
+            mState.IvTipusLesz = ' ';
+        } else {
+            mState.IvTipusLesz = mState.IvTipus;
+            mState.IvTipus = '?';
+        }
+        mState.IvStartX = 0f; mState.IvStartY = 0f;
+        mState.IvEndX = 0f; mState.IvEndY = 0f;
+        mState.IvBalX = -1f; mState.IvMaxY = -1f;
 	}
 	
 	private void startTri(char c2) {
@@ -1239,7 +1248,7 @@ public class Kotta
 		//number
 		int id;
 		float nw,nh;
-		if (mState.TriTipus=='3') {
+		if (tri) {
 			id=R.drawable.triola;
 			nw=KottaConst.TriolaWIDTH;
 			nh=KottaConst.TriolaHEIGHT;
