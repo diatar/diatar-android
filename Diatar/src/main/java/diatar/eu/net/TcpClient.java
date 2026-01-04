@@ -9,6 +9,7 @@ public class TcpClient {
 	private ArrayList<TcpThread> mTcpLst;
 	private MainActivity mMain;
 	private Lock mLock;
+	private MqttInterface mMqtt;
 	
 	public volatile RecBase mRecToSend;
 	public volatile RecState mStateToSend;
@@ -22,6 +23,7 @@ public class TcpClient {
 		mLock = new ReentrantLock();
 		mStateToSend = new RecState();
 		mTcpLst = new ArrayList<TcpThread>();
+		mMqtt=MqttInterface.getInstance();
 		fillState();
 		mRunning=true;
 	}
@@ -45,6 +47,10 @@ public class TcpClient {
 		mTcpLst.clear();
 		for (int i=0; i<G.sIpCnt; i++)
 			mTcpLst.add(new TcpThread(i,G.sIpAddr[i],G.sIpPort[i]));
+		mMqtt.Username=G.sUser;
+		mMqtt.Password=G.sPsw;
+		mMqtt.Channel=G.sChannel;
+		mMqtt.openSender(MqttInterface.OpenMode.omSENDER);
 	}
 	
 	public void setBlankToSend(RecBlank r) {
@@ -53,6 +59,7 @@ public class TcpClient {
 			mBlankToSend=r;
 			for (TcpThread t : mTcpLst)
 				t.mBlankIsWaiting=true;
+			mMqtt.sendBlank(r);
 		} finally {
 			Unlock();
 		}
@@ -65,6 +72,8 @@ public class TcpClient {
 			mRtsType=rtype;
 			for (TcpThread t : mTcpLst)
 				t.mRecIsWaiting=true;
+			if (rtype==RecHdr.itPic) mMqtt.sendPic((RecPic)r);
+			else if (rtype==RecHdr.itText) mMqtt.sendTxt((RecText)r);
 		} finally {
 			Unlock();
 		}
@@ -107,6 +116,7 @@ public class TcpClient {
 	public void sendState() {
 		for (TcpThread t : mTcpLst)
 			t.mStateIsWaiting=true;
+		mMqtt.sendState(mStateToSend);
 	}
 	
 	public void fillState() {
@@ -128,8 +138,8 @@ public class TcpClient {
 		mStateToSend.setUseKotta(G.sUseKotta);
 		mStateToSend.setHideTitle(!G.sUseTitle);
 		mStateToSend.setBgMode(G.sBgMode);
-		mStateToSend.setIsBlankPic(!G.sBlankPic.isEmpty());
-		mStateToSend.setShowBlankPic(!G.sBlankPic.isEmpty());
+		mStateToSend.setIsBlankPic(G.sBlankPic!=null && !G.sBlankPic.isEmpty());
+		mStateToSend.setShowBlankPic(G.sBlankPic!=null && !G.sBlankPic.isEmpty());
 		mStateToSend.setKottaArany(G.sKottaArany);
 		mStateToSend.setAkkordArany(G.sAkkordArany);
 		mStateToSend.setBackTransPerc(G.sBackTrans);

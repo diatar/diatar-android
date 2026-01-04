@@ -199,7 +199,7 @@ public class SettingsActivity extends Activity
 			int sel = mSenderLstAdapter.getSelection();
 			if (sel != RecyclerView.NO_POSITION) {
 				String uname = mSenderLstAdapter.getItem(sel);
-				MqttInterface.UserArray user = mMqtt.getUser(uname);
+				MqttInterface.tUserRec user = mMqtt.getUser(uname);
 				if (user != null) {
 					for (int i = 0; i < 10; i++) {
 						String chname = user.Channels[i];

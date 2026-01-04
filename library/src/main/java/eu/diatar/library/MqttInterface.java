@@ -7,12 +7,14 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.hivemq.client.mqtt.MqttClient;
+import com.hivemq.client.mqtt.MqttClientState;
 import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.datatypes.MqttTopic;
-import com.hivemq.client.mqtt.datatypes.MqttTopicFilter;
 import com.hivemq.client.mqtt.datatypes.MqttUtf8String;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
+import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAckReturnCode;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 
 import org.json.JSONArray;
@@ -25,6 +27,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 public class MqttInterface {
@@ -42,19 +49,19 @@ public class MqttInterface {
     private static final String DYNSECTOPIC = "$CONTROL/dynamic-security/v1";
     private static final String DYNSECTOPICRESPONSE = DYNSECTOPIC + "/response";
 
-    public static class UserArray {
+    public static class tUserRec {
         public String UserName; //felhasznalonev
         public String Email;  //email-cim
         public String[] Channels = new String[10]; //kuldesi csatornak
-        public boolean SentForDetails; //nev elkuldve a reszletek lekerdezesere
+        public volatile boolean SentForDetails; //nev elkuldve a reszletek lekerdezesere
         public boolean SendersGroup; //normal felhasznalo
     }
 
-    private UserArray[] users;
+    private tUserRec[] mUsers;
 
     public String Username, Password, Channel;
     private String topicGroup, topicMask, topicBlank, topicState, topicDia;
-    private boolean isOpen;
+    private volatile boolean isOpen;
     public enum OpenMode {
         //normal user mod:
         omRECEIVER,                //vetel
@@ -74,9 +81,10 @@ public class MqttInterface {
     }
     private OpenMode openMode;
 
-    //singleton
-    static private MqttInterface me = null;
+    private final Object lock = new Object();
+    private CompletableFuture<Void> disconnectFuture = null;    //singleton
 
+    static private MqttInterface me = null;
     static public MqttInterface getInstance() {
         if (me==null) me = new MqttInterface();
         return me;
@@ -91,11 +99,18 @@ public class MqttInterface {
                 .serverPort(1883)
                 .automaticReconnect()
                     .initialDelay(1, java.util.concurrent.TimeUnit.SECONDS)
-                    .maxDelay(30, java.util.concurrent.TimeUnit.SECONDS)
+                    .maxDelay(5, java.util.concurrent.TimeUnit.SECONDS)
                     .applyAutomaticReconnect()
                 .addConnectedListener(context -> {
                     registerPublishHandler();
                     subscribeTopics();
+                })
+                .addDisconnectedListener(ctx -> {
+                    synchronized (lock) {
+                        if (disconnectFuture != null && !disconnectFuture.isDone()) {
+                            disconnectFuture.complete(null);
+                        }
+                    }
                 })
                 .buildAsync();
     }
@@ -155,6 +170,7 @@ public class MqttInterface {
     }
 
     private boolean processLISTCLIENTS(@NonNull JSONObject jResp, boolean iscont) {
+        Log.d("Mqtt-admin", jResp.toString());
         JSONObject jData = jResp.optJSONObject("data");
         if (jData == null) {
             //hianyzik a 'data'
@@ -166,17 +182,18 @@ public class MqttInterface {
             return false;
         }
         int len = jClients.length();
-        UserArray[] uarr = new UserArray[len];
+        tUserRec[] uarr = new tUserRec[len];
         for (int i=0; i<len; i++) {
-            uarr[i] = new UserArray();
+            uarr[i] = new tUserRec();
             uarr[i].UserName = jClients.optString(i);
         }
-        users = uarr;
+        mUsers = uarr;
 
         return iscont || sendUserDetails();
     }
 
     private boolean processGETCLIENT(JSONObject jResp, boolean iscont) {
+        Log.d("Mqtt-admin", jResp.toString());
         JSONObject jData = jResp.optJSONObject("data");
         if (jData == null) {
             //hianyzik a 'data'
@@ -194,18 +211,18 @@ public class MqttInterface {
         }
 
         //megkeressuk a nevet a tombben
-        int idx = users.length;
-        while (idx-->0 && !users[idx].UserName.equals(uname)) continue;
+        int idx = mUsers.length;
+        while (idx-->0 && !mUsers[idx].UserName.equals(uname)) continue;
         if (idx<0) {
             //ez elvileg nem lehet, de...
-            idx=users.length;
-            users = Arrays.copyOf(users, idx+1);
-            users[idx].UserName=uname;
-            users[idx].SentForDetails=true;
+            idx= mUsers.length;
+            mUsers = Arrays.copyOf(mUsers, idx+1);
+            mUsers[idx].UserName=uname;
+            mUsers[idx].SentForDetails=true;
         }
 
         //email es kuldesi csatornak
-        users[idx].Email = jClient.optString("textname");
+        mUsers[idx].Email = jClient.optString("textname");
         fillChannels(idx, jClient.optString("textdescription"));
 
         //kuldo felhasznalo?
@@ -214,7 +231,7 @@ public class MqttInterface {
             for (int i = 0; i < jRoles.length(); i++) {
                 String rname = jRoles.optJSONObject(i).optString("rolename");
                 if (rname.startsWith("s-")) {
-                    users[idx].SendersGroup=true;
+                    mUsers[idx].SendersGroup=true;
                     break;
                 }
             }
@@ -248,22 +265,23 @@ public class MqttInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("{\"commands\": [");
         int cnt=0;
-        for (int i=0; i<users.length; i++) {
-            if (users[i].SentForDetails) continue;
-            users[i].SentForDetails=true;
+        for (int i = 0; i< mUsers.length; i++) {
+            if (mUsers[i].SentForDetails) continue;
+            mUsers[i].SentForDetails=true;
             if (cnt>0) sb.append(", ");
             sb.append("{\"command\": \"getClient\", \"username\": \"");
-            sb.append(users[i].UserName);
+            sb.append(mUsers[i].UserName);
             sb.append("\"}");
             cnt++;
-            if (cnt>=10) break;
+            if (cnt>=5) break;
         }
         if (cnt<=0) return false;
         sb.append("]}");
+        Log.d("Mqtt-admin", sb.toString());
         //send command
         client.publishWith()
                 .topic(DYNSECTOPIC)
-                .payload(sb.toString().getBytes())
+                .payload(sb.toString().getBytes(StandardCharsets.UTF_8))
                 .send()
                 .exceptionally(throwable -> {
                     doOnError("Adatküldési hiba: "+throwable.getLocalizedMessage());
@@ -331,7 +349,7 @@ public class MqttInterface {
                     i++;
                     continue;
                 }
-                users[idx].Channels[arridx]=sb.toString().trim();
+                mUsers[idx].Channels[arridx]=sb.toString().trim();
                 sb.setLength(0);
                 arridx++;
                 if (arridx>=10) return;
@@ -348,13 +366,27 @@ public class MqttInterface {
     }
 
     private CompletableFuture<Void> ensureDisconnected() {
-        if (client.getState().isConnected()) {
-            return client.disconnect().thenCompose(v -> {
-                isOpen=false;
+        synchronized (lock) {
+
+            MqttClientState state = client.getState();
+
+            // Már leválasztva → azonnal kész
+            if (state == MqttClientState.DISCONNECTED) {
                 return CompletableFuture.completedFuture(null);
-            });
-        } else {
-            return CompletableFuture.completedFuture(null);
+            }
+
+            // Már folyamatban van egy disconnect → ugyanarra várunk
+            if (disconnectFuture != null && !disconnectFuture.isDone()) {
+                return disconnectFuture;
+            }
+
+            // Új disconnect ciklus
+            disconnectFuture = new CompletableFuture<>();
+
+            // CONNECTED vagy CONNECTING esetén is!
+            client.disconnect();
+
+            return disconnectFuture;
         }
     }
 
@@ -363,13 +395,14 @@ public class MqttInterface {
             client.connectWith()
                 .simpleAuth()
                 .username(decodePsw(DYNSECSUPERUSER))
-                .password(decodePsw(DYNSECSUPERPSW).getBytes())
+                .password(decodePsw(DYNSECSUPERPSW).getBytes(StandardCharsets.UTF_8))
                 .applySimpleAuth()
                 .send()
         );
     }
 
     private void executeAdmin(String cmd) {
+        Log.d("Mqtt-admin", "cmd: "+cmd);
         connectAdmin().thenCompose(connAck ->
             client.subscribeWith()
                 .topicFilter(DYNSECTOPICRESPONSE)
@@ -378,7 +411,7 @@ public class MqttInterface {
                 registerPublishHandler();
                 return client.publishWith()
                         .topic(DYNSECTOPIC)
-                        .payload(cmd.getBytes())
+                        .payload(cmd.getBytes(StandardCharsets.UTF_8))
                         .send();
             }).exceptionally(throwable -> {
                 close();
@@ -388,10 +421,13 @@ public class MqttInterface {
         );
     }
 
+    private boolean registered = false;
     private void registerPublishHandler() {
         if (openMode.ordinal() < OpenMode.omFIRST_ADMIN.ordinal()) {
             client.publishes(MqttGlobalPublishFilter.ALL, this::projectionReceived);
         } else {
+            if (registered) return;
+            registered=true;
             client.publishes(MqttGlobalPublishFilter.ALL, publish -> {
                 String msg = new String(publish.getPayloadAsBytes(), StandardCharsets.UTF_8);
                 messageReceived(msg);
@@ -399,6 +435,7 @@ public class MqttInterface {
         }
     }
     private void subscribeTopics() {
+        if (openMode==OpenMode.omSENDER) return;
         String filter = (openMode.ordinal() < OpenMode.omFIRST_ADMIN.ordinal()
                 ? topicMask : DYNSECTOPICRESPONSE);
         client.subscribeWith()
@@ -410,6 +447,51 @@ public class MqttInterface {
                     doOnError("Internet hiba: " + err.getLocalizedMessage());
                 }
             });
+    }
+
+    private boolean testCredentialsBlocking(String username, String password) {
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        Future<Boolean> f = exec.submit(() -> {
+
+            Mqtt3BlockingClient testClient = null;
+            try {
+                testClient = MqttClient.builder()
+                        .useMqttVersion3()
+                        .identifier("test-" + UUID.randomUUID())
+                        .serverHost("mqtt.diatar.eu")
+                        .serverPort(1883)
+                        .buildBlocking();
+
+                Mqtt3ConnAck ack =
+                        testClient.connectWith()
+                                .simpleAuth()
+                                .username(username)
+                                .password(password.getBytes(StandardCharsets.UTF_8))
+                                .applySimpleAuth()
+                                .send();
+
+                return ack.getReturnCode()
+                        == Mqtt3ConnAckReturnCode.SUCCESS;
+
+            } finally {
+                if (testClient != null) {
+                    try {
+                        testClient.disconnect();
+                    } catch (Exception ignored) {}
+                }
+            }
+        });
+
+        try {
+            return f.get(5, TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            f.cancel(true); // megszakítás
+            return false;
+        } catch (Exception e) {
+            return false;
+        } finally {
+            exec.shutdownNow();
+        }
     }
 
     //***********************************************
@@ -456,31 +538,56 @@ public class MqttInterface {
         isOpen=false;
     }
 
-    public void openSender() {
+    public void chkLogin(String username, String psw) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+
+            boolean ok = testCredentialsBlocking(username, psw);
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (ok) doOnCompleted(null);
+                else doOnError("Hibás felhasználónév vagy jelszó");
+            });
+        });
+    }
+
+
+    public boolean openSender(OpenMode om) {
         Channel="1";
         if (Username.isEmpty() || Channel.isEmpty() || Password.isEmpty()) {
+            doOnError("Hiányos internet belépési adatok!");
             close();
-            return;
+            return false;
         }
+        if (om!=OpenMode.omSENDER && om!=OpenMode.omCHKLOGIN)
+            return false;
+
         topicGroup="Diatar/"+Username+"/"+Channel+"/";
         topicMask=topicGroup+"#";
         topicState=topicGroup+"state";
         topicBlank=topicGroup+"blank";
         topicDia=topicGroup+"dia";
-        openMode=OpenMode.omSENDER;
+        openMode=om;
         isOpen=true;
         ensureDisconnected().thenCompose(v ->
                 client.connectWith()
                     .simpleAuth()
-                    .username("receiver")
-                    .password("receiverpsw".getBytes())
+                    .username(Username)
+                    .password(Password.getBytes(StandardCharsets.UTF_8))
                     .applySimpleAuth()
                     .send()
-                    ).exceptionally(throwable -> {
+                        //.orTimeout(5, TimeUnit.SECONDS)
+                    .thenAccept(connAck -> {
+                        if (connAck.getReturnCode() != Mqtt3ConnAckReturnCode.SUCCESS) {
+                            close();
+                            doOnError("Sikertelen belépés! Név/jelszó hiba?");
+                        }
+                    })
+            .exceptionally(throwable -> {
                         close();
                         doOnError("Megnyitási hiba: "+throwable.getLocalizedMessage());
                         return null;
-                    });
+                    }));
+        return true;
     }
 
     public void openReceiver() {
@@ -500,7 +607,7 @@ public class MqttInterface {
             client.connectWith()
                 .simpleAuth()
                 .username("receiver")
-                .password("receiverpsw".getBytes())
+                .password("receiverpsw".getBytes(StandardCharsets.UTF_8))
                 .applySimpleAuth()
                 .send()
 
@@ -517,6 +624,7 @@ public class MqttInterface {
     }
 
     public void fillUserList() {
+        Log.d("Mqtt-admin", "fillUserList");
         openMode=OpenMode.omUSERLIST;
         executeAdmin("{\"commands\": [{\"command\": \"listClients\"}]}");
     }
@@ -656,9 +764,9 @@ public class MqttInterface {
         String mymask = unaccent(mask);
         if (mymask.isEmpty()) return res;
 
-        UserArray[] uarr = users;
+        tUserRec[] uarr = mUsers;
         if (uarr==null) return res;
-        for (UserArray u : uarr) {
+        for (tUserRec u : uarr) {
             if (!u.SendersGroup) continue;
             String myuser = unaccent(u.UserName);
             if (mymask.length()==1 ? myuser.startsWith(mymask) : myuser.contains(mymask)) {
@@ -669,11 +777,11 @@ public class MqttInterface {
         return res;
     }
 
-    public UserArray getUser(String uname) {
+    public tUserRec getUser(String uname) {
         String myname = unaccent(uname);
-        UserArray[] uarr = users;
+        tUserRec[] uarr = mUsers;
         if (uarr==null) return null;
-        for (UserArray u : uarr) {
+        for (tUserRec u : uarr) {
             if (!u.SendersGroup) continue;
             String myuser = unaccent(u.UserName);
             if (myuser.equals(myname)) return u;

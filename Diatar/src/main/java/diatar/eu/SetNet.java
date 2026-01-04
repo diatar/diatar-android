@@ -31,7 +31,7 @@ public class SetNet extends Activity
         super.onCreate(bd);
 
 		setContentView(diatar.eu.R.layout.setnet);
-		setTitle("Hálózat beállítás");
+		setTitle("Helyi hálózat beállítás");
 		
 		mAddrEd = new EditText[NADDR];
 		mPortEd = new EditText[NADDR];

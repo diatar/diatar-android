@@ -351,6 +351,7 @@ public class TcpServer extends Thread
 	}
 	
 	public void setPort(int newval) {
+        //Msg("Port: "+ newval);
 		if (newval==portnum) return;
 		portnum=newval;
 		try {
