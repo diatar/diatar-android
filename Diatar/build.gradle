@@ -9,7 +9,7 @@ android {
         applicationId "diatar.eu"
         minSdk 24
         targetSdk 35
-        versionCode 61
+        versionCode 69
         versionName "8.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

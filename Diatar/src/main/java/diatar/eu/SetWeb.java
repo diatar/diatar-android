@@ -78,8 +78,8 @@ public class SetWeb extends Activity {
     }
 
     private void save(Bundle bd) {
+        bd.putString(G.idUSER, mUser.getText().toString());
         if (mWebOn.isChecked()) {
-            bd.putString(G.idUSER, mUser.getText().toString());
             bd.putString(G.idPSW, mPsw.getText().toString());
         }
     }
@@ -125,7 +125,7 @@ public class SetWeb extends Activity {
 
     public void onOk(View v) {
         if (!mWebOn.isChecked()) {
-            G.sUser="";
+            G.sUser=mUser.getText().toString();
             G.sPsw="";
             setResult(RESULT_OK);
             finish();

@@ -2,6 +2,7 @@ package diatar.eu;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.*;
 import android.widget.*;
 import android.view.*;
@@ -30,6 +31,7 @@ public class MainActivity extends MainMenu
 	private ImageButton mPrevHBtn, mNextHBtn;
 	private LinearLayout mMainCtrl1, mMainCtrl2;
 	private Toolbar mToolbar;
+    private TextView mWebIcon, mLanIcon;
 	
 	TcpClient mTcp;
 	//ujratolteshez
@@ -66,6 +68,14 @@ public class MainActivity extends MainMenu
 		mNextHBtn = findViewById(R.id.NextHBtn);
 		mMainCtrl1 = findViewById(R.id.MainControls1);
 		mMainCtrl2 = findViewById(R.id.MainControls2);
+        mWebIcon = findViewById(R.id.MainWebIcon);
+        mLanIcon = findViewById(R.id.MainLanIcon);
+
+        MqttInterface mqtt = MqttInterface.getInstance();
+        mqtt.setOpenState(this::WebStateChanged);
+        WebStateChanged(mqtt.isOpen() ? 1 : 0);
+
+        mTcp.setOpenState(this::LanStateChanged);
 
 		mToolbar = findViewById(R.id.main_toolbar);
 		setSupportActionBar(mToolbar);
@@ -189,7 +199,43 @@ public class MainActivity extends MainMenu
 		};
 		ddl.execute();
 	}
-	
+
+    private void WebStateChanged(int state) {
+        if (state==1) { //open
+            //mWebIcon.setText("\u25CD");
+            mWebIcon.setTextColor(0xFF00C000);
+            sendNetCurrDia();
+            sendNetBlank();
+            setShowState();
+        } else if (state==-1) { //error
+            //mWebIcon.setText("\u2299");
+            mWebIcon.setTextColor(0xFFFF0000);
+        } else if (state==-2) { //opening
+            mWebIcon.setTextColor(0xFFC0C000);
+        } else { //close
+            //mWebIcon.setText("\u25CE");
+            mWebIcon.setTextColor(0xFFC0C0C0);
+        }
+    }
+
+    private void LanStateChanged(int state) {
+        if (state==1) { //open
+            //mLanIcon.setText("\u2301");
+            mLanIcon.setTextColor(0xFF00BF00);
+            sendNetCurrDia();
+            sendNetBlank();
+            setShowState();
+        } else if (state==-1) { //error
+            //mLanIcon.setText("\u2299");
+            mLanIcon.setTextColor(0xFFFF0000);
+        } else if (state==-2) { //opening
+            mLanIcon.setTextColor(0xFFC0C000);
+        } else { //close
+            //mLanIcon.setText("\u25CE");
+            mLanIcon.setTextColor(0xFFC0C0C0);
+        }
+    }
+
 	public void EndNetRefresh() {
 		G.sDownLastDay = System.currentTimeMillis()/(24*60*60*1000);
 		G.Save(this);
@@ -279,16 +325,22 @@ public class MainActivity extends MainMenu
 		RecBase rec;
 		byte rtyp;
 		if (d!=null && d.mTipus==DiaItem.ditPIC) {
-			File f = new File(d.mKnev,d.mVnev);
-			RecPic rp = new RecPic(8+(int)f.length());
+            InputStream is=null;
+            int flen=0;
+            try {
+                if (d.mKnev.isEmpty() && d.mVnev.contains(":"))
+                    is = getContentResolver().openInputStream(Uri.parse(d.mVnev));
+                else
+                    is = new FileInputStream(new File(d.mKnev, d.mVnev));
+                flen = (is==null ? 0 : is.available());
+            } catch(Exception e) {}
+			RecPic rp = new RecPic(8+(int)flen);
 			rp.setLen(rp.getMaxlen());
-			String ext = f.getName();
+			String ext = d.mKnev+d.mVnev;
 			ext=ext.substring(ext.lastIndexOf('.')+1);
 			rp.setExt(ext);
 			try {
-				try (FileInputStream fis = new FileInputStream(f)) {
-					fis.read(rp.buf, 8, (int) f.length());
-				}
+                is.read(rp.buf, 8, flen);
 			} catch(Exception e) { }
 			rec=rp; rtyp=RecHdr.itPic;
 		} else {
@@ -530,6 +582,8 @@ public class MainActivity extends MainMenu
 				if (actionBar!=null) actionBar.show();
 			}
 		}
+
+        MPAdapter.resizeCurrItem();
 	}
 	
 	//////////////////////////////
@@ -625,6 +679,14 @@ public class MainActivity extends MainMenu
 	public void onShowBtn(View v) {
 		flipShowState();
 	}
+
+    public void onWebIcon(View v) {
+        doMenuWeb();
+    }
+
+    public void onLanIcon(View v) {
+        doMenuNet();
+    }
 	
 	public void onPrevHBtn(View v) {
 		MainSlideFragment fr = MPAdapter.mCurrFragment;
@@ -718,8 +780,8 @@ public class MainActivity extends MainMenu
 	}
 	
 	@Override
-	protected void whenSetNeted() {
-		G.Save(this);
+	protected void whenSetNeted(boolean ok) {
+		if (ok) G.Save(this);
 		mTcp.fillState();
 		mTcp.Open();
 		sendNetCurrDia();
@@ -836,6 +898,15 @@ public class MainActivity extends MainMenu
 			}
 			super.setPrimaryItem(vg,pos,obj);
 		}
-		
-	}
+
+        public void resizeCurrItem() {
+            View v = mCurrFragment.getView();
+            if (v instanceof MainTxtView) {
+                MainTxtView mtv = (MainTxtView)v;
+                mtv.recalc();
+            }
+        }
+
+    }
+
 } /**/

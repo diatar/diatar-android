@@ -31,6 +31,7 @@ public class G  //globals
 	public static final String idISDIR = "isdir";
 	public static final String idORIG = "orig";
 	public static final String idINDEX = "idx";
+    public static final String idIPON = "IpOn";
 	public static final String idIPCNT = "IpCnt";
 	public static final String idIPADDR = "IpAddr";
 	public static final String idIPPORT = "IpPort";
@@ -88,6 +89,7 @@ public class G  //globals
 	public static String sLoadDir;
 	public static String sPicDir;
 	public static int sIpCnt;
+    public static boolean sIpOn;
 	public static String[] sIpAddr;
 	public static int[] sIpPort;
 	public static boolean sAutosize;
@@ -131,6 +133,7 @@ public class G  //globals
 		sLoadDir=sp.getString(idDIR,"/");
 		sPicDir=sp.getString(idPICDIR,"/");
 		setIpCnt(sp.getInt(idIPCNT,0));
+        sIpOn=sp.getBoolean(idIPON,sIpCnt>0);
 		for (int i=0; i<sIpCnt; i++) {
 			sIpAddr[i]=sp.getString(idIPADDR+i,"1.1.1.1");
 			sIpPort[i]=sp.getInt(idIPPORT+i,1024);
@@ -176,6 +179,7 @@ public class G  //globals
 		spe.putString(idDIR,sLoadDir);
 		spe.putString(idPICDIR,sPicDir);
 		spe.putInt(idIPCNT,sIpCnt);
+        spe.putBoolean(idIPON,sIpOn);
 		for (int i=0; i<sIpCnt; i++) {
 			spe.putString(idIPADDR+i,sIpAddr[i]);
 			spe.putInt(idIPPORT+i,sIpPort[i]);

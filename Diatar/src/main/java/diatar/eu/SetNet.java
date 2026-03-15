@@ -17,6 +17,7 @@ public class SetNet extends Activity
 	private ImageButton[] mDelBtn;
 	private Button mNewBtn;
 	private TextView mTV1, mTV2;
+    private Switch mNetOn;
 	
 	private int mCnt;
 	
@@ -62,16 +63,19 @@ public class SetNet extends Activity
 			ae.setText(av);
 			pe.setText(String.valueOf(pv));
 		}
+        mNetOn=findViewById(diatar.eu.R.id.setNetOn);
 		mNewBtn=findViewById(diatar.eu.R.id.setIpNewBtn);
 		mTV1=findViewById(diatar.eu.R.id.setNetTV1);
 		mTV2=findViewById(diatar.eu.R.id.setNetTV2);
 		showByCnt();
+        mNetOn.setChecked(bd==null ? G.sIpOn : bd.getBoolean(G.idIPON,true));
 	}
 	
 	@Override
 	protected void onSaveInstanceState(Bundle outState)
 	{
 		super.onSaveInstanceState(outState);
+        outState.putBoolean(G.idIPON,mNetOn.isChecked());
 		outState.putInt(G.idIPCNT,mCnt);
 		for (int i=0; i<NADDR; i++) {
 			outState.putString(G.idIPADDR+i,mAddrEd[i].getText().toString());
@@ -92,6 +96,7 @@ public class SetNet extends Activity
 				return;
 			}
 		}
+        G.sIpOn=mNetOn.isChecked();
 		G.setIpCnt(mCnt);
 		for (int i=0; i<mCnt; i++) {
 			G.sIpAddr[i]=mAddrEd[i].getText().toString();
@@ -103,6 +108,7 @@ public class SetNet extends Activity
 	}
 	
 	public void onNew(View v) {
+        mNetOn.setChecked(true);
 		mCnt++; showByCnt();
 	}
 	
@@ -116,6 +122,7 @@ public class SetNet extends Activity
 			idx++;
 		}
 		mCnt--; showByCnt();
+        if (mCnt<=0) mNetOn.setChecked(false);
 	}
 	
 	private int getPort(int idx) {

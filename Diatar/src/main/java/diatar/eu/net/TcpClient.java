@@ -3,6 +3,8 @@ package diatar.eu.net;
 import diatar.eu.*;
 import java.util.concurrent.locks.*;
 import java.util.*;
+import java.util.function.Consumer;
+
 import eu.diatar.library.*;
 
 public class TcpClient {
@@ -16,8 +18,10 @@ public class TcpClient {
 	public volatile RecBlank mBlankToSend;
 	public volatile byte mRtsType;
 	public volatile boolean mRunning;
-	
-	static private TcpClient me = null;
+    private Consumer<Integer> OnOpenStateCallback;  // 0=closed, 1=open, -1=error
+    private int mLastState = 0;
+
+	private static TcpClient me = null;
 
 	private TcpClient() {
 		mLock = new ReentrantLock();
@@ -42,16 +46,33 @@ public class TcpClient {
 	public void Unlock() { mLock.unlock(); }
 	
 	public void Open() {
+        boolean anyopen = false;
+        doOpenChange(-2);
 		for (TcpThread t : mTcpLst)
 			t.mRunning=false;
 		mTcpLst.clear();
-		for (int i=0; i<G.sIpCnt; i++)
-			mTcpLst.add(new TcpThread(i,G.sIpAddr[i],G.sIpPort[i]));
-		mMqtt.Username=G.sUser;
-		mMqtt.Password=G.sPsw;
-		mMqtt.Channel=G.sChannel;
-		mMqtt.openSender(MqttInterface.OpenMode.omSENDER);
+        if (G.sIpOn) {
+            for (int i=0; i<G.sIpCnt; i++) {
+                mTcpLst.add(new TcpThread(i, G.sIpAddr[i], G.sIpPort[i]));
+                anyopen = true;
+            }
+        }
+        if (!anyopen) doOpenChange(0);
+
+        openMqtt();
 	}
+
+    public void openMqtt() {
+        if (mMqtt.isOpen()) return;
+        mMqtt.Username=G.sUser;
+        mMqtt.Password=G.sPsw;
+        mMqtt.Channel=G.sChannel;
+        mMqtt.openSender(MqttInterface.OpenMode.omSENDER);
+    }
+
+    public void closeMqtt() {
+        mMqtt.close();
+    }
 	
 	public void setBlankToSend(RecBlank r) {
 		Lock();
@@ -175,5 +196,16 @@ public class TcpClient {
 		mRunning=false;
 		me=null;
 	}
+
+    public void doOpenChange(int state) {
+        mLastState=state;
+        if (OnOpenStateCallback!=null)
+            MqttInterface.runInMainThread(() -> OnOpenStateCallback.accept(state));
+    }
+
+    public void setOpenState(Consumer<Integer> onOpenState) {
+        OnOpenStateCallback=onOpenState;
+        doOpenChange(mLastState);
+    }
 
 } // TcpClient

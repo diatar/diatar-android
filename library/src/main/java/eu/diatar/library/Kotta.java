@@ -279,6 +279,7 @@ public class Kotta
 		if (mCanvas==null) return getWidth(s);
 		float x0=mX;
 		Draw(s);
+        mState.IvBalX=mX;
 		return mX-x0;
 	}
 	
@@ -884,7 +885,7 @@ public class Kotta
 		}
 	}
 	
-	private void drawIv(char c2,boolean start) {
+	private void drawIv(char c2, boolean start) {
 		if (start) {
 			mState.IvTipusLesz=c2;
 			return;
@@ -1073,11 +1074,12 @@ public class Kotta
 	/////////////////////
 	// kotoiv
 	/////////////////////
-	
+
+    //ezt hangjegyek kiirasa vegen mindig hivjuk
 	private void addIv(RectF r, boolean also) {
-		if (mState.IvTipus=='a' || mState.IvTipus=='f') {  //kotoiven belul
+		if (mState.IvTipus!=' ') {  //kotoiven belul
 			mState.IvEndX=r.centerX(); mState.IvEndY=r.centerY();
-			if (mState.IvTipus=='a') {
+			if (mState.IvTipus=='a' || mState.IvTipus=='A') {
 				if (mState.IvEndY>mState.IvMaxY) mState.IvMaxY=mState.IvEndY;
 			} else {
 				if (mState.IvMaxY<0f) mState.IvMaxY=mState.IvEndY;
@@ -1101,7 +1103,9 @@ public class Kotta
 
 		boolean vaneleje=(mState.IvTipus=='a' || mState.IvTipus=='f');
 		boolean vanvege=(endtipus=='a' || endtipus=='f');
-		if (mState.IvBalX<0f || mState.IvMaxY<0f) return;
+		if (mState.IvBalX<0f || mState.IvMaxY<0f) {
+            return;
+        }
 		if (!vaneleje && !vanvege) return;
 		boolean also=(vanvege ? endtipus=='a' : mState.IvTipus=='a');
 		float Ykoz=mLineY[1]-mLineY[0];
@@ -1112,7 +1116,8 @@ public class Kotta
 		fY[0]=(vaneleje ? mState.IvStartY : mState.IvMaxY);
 		
 		//2.jobb sarok
-		fX[1]=mState.IvEndX; fY[1]=mState.IvEndY;
+		fX[1]=mState.IvEndX;
+        fY[1]=mState.IvEndY;
 		
 		//eltolas a kottafejtol
 		fY[0]+=aYkoz; fY[1]+=aYkoz;
@@ -1123,14 +1128,20 @@ public class Kotta
 		float xlenperr=xlen/r, ylenperr=ylen/r;
 		
 		//3..4.kozep, belso kozep
-		fX[2]=(fX[0]+fX[1])/2f;
-		fY[2]=(fY[0]+fY[1])/2f;
-		fX[3]=fX[2]; fY[3]=fY[2];
-		fX[2]=fX[2]-aYkoz*ylenperr;
-		fY[2]=fY[2]+aYkoz*xlenperr;
-		fX[3]=fX[3]-aYkoz*0.75f*ylenperr;
-		fY[3]=fY[3]+aYkoz*0.75f*xlenperr;
-		
+        if (vaneleje && vanvege) {
+            fX[2] = (fX[0] + fX[1]) / 2f;
+            fY[2] = (fY[0] + fY[1]) / 2f;
+        } else {
+            fX[2] = (vanvege ? mX0 : mX); //eleje vagy vege hianyzik
+            fY[2] = mState.IvMaxY;
+        }
+        fX[3] = fX[2];
+        fY[3] = fY[2];
+        fX[2] = fX[2] - aYkoz * ylenperr;
+        fY[2] = fY[2] + aYkoz * xlenperr;
+        fX[3] = fX[3] - aYkoz * 0.75f * ylenperr;
+        fY[3] = fY[3] + aYkoz * 0.75f * xlenperr;
+
 		//5..8.kozepek iranya
 		float v=r/4f;
 		float vx=v*xlenperr, vy=v*ylenperr;
@@ -1202,12 +1213,17 @@ public class Kotta
             mState.IvTipus = ' ';
             mState.IvTipusLesz = ' ';
         } else {
-            mState.IvTipusLesz = mState.IvTipus;
-            mState.IvTipus = '?';
+            if (mState.IvTipus == 'a' || mState.IvTipus == 'A') {
+                mState.IvTipusLesz = 'A';
+                mState.IvTipus = 'A';
+            } else {
+                mState.IvTipusLesz = 'F';
+                mState.IvTipus = 'F';
+            }
         }
         mState.IvStartX = 0f; mState.IvStartY = 0f;
         mState.IvEndX = 0f; mState.IvEndY = 0f;
-        mState.IvBalX = -1f; mState.IvMaxY = -1f;
+        mState.IvMaxY = -1f;
 	}
 	
 	private void startTri(char c2) {

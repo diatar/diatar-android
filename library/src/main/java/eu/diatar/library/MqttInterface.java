@@ -43,6 +43,7 @@ public class MqttInterface {
     private Consumer<RecPic> OnRecPicCallback;
     private Consumer<RecBlank> OnRecBlankCallback;
     private Consumer<RecText> OnRecTextCallback;
+    private Consumer<Integer> OnOpenStateCallback;  // 0=closed, 1=open, -1=error
 
     public static class tUserRec {
         public String UserName; //felhasznalonev
@@ -56,7 +57,7 @@ public class MqttInterface {
 
     public String Username, Password, Channel;
     private String topicGroup, topicMask, topicBlank, topicState, topicDia;
-    private volatile boolean isOpen;
+    private volatile boolean mIsOpen;
     public enum OpenMode {
         //normal user mod:
         omRECEIVER,                //vetel
@@ -78,7 +79,8 @@ public class MqttInterface {
 
     private final Object lock = new Object();
     private CompletableFuture<Void> disconnectFuture = null;    //singleton
-
+    private CompletableFuture<Void> connectionChain =
+            CompletableFuture.completedFuture(null);
     static private MqttInterface me = null;
     static public MqttInterface getInstance() {
         if (me==null) me = new MqttInterface();
@@ -92,10 +94,10 @@ public class MqttInterface {
                 .identifier(UUID.randomUUID().toString())
                 .serverHost("mqtt.diatar.eu")
                 .serverPort(1883)
-                .automaticReconnect()
-                    .initialDelay(1, java.util.concurrent.TimeUnit.SECONDS)
-                    .maxDelay(5, java.util.concurrent.TimeUnit.SECONDS)
-                    .applyAutomaticReconnect()
+                //.automaticReconnect()
+                //    .initialDelay(1, java.util.concurrent.TimeUnit.SECONDS)
+                //    .maxDelay(5, java.util.concurrent.TimeUnit.SECONDS)
+                //    .applyAutomaticReconnect()
                 .addConnectedListener(context -> {
                     registerPublishHandler();
                     subscribeTopics();
@@ -106,6 +108,7 @@ public class MqttInterface {
                             disconnectFuture.complete(null);
                         }
                     }
+                    if (mIsOpen) scheduleReconnect();
                 })
                 .buildAsync();
     }
@@ -128,7 +131,7 @@ public class MqttInterface {
                 if (processResponse(jResp.getJSONObject(idx), iscont)) iscont=true;
             if (!iscont) {
                 doOnCompleted(null);
-                close();
+                doClose();
             }
         } catch (Exception e) {
             doOnError("Hibás input!");
@@ -315,11 +318,18 @@ public class MqttInterface {
     }
 
     private void processDia(@NonNull byte[] buf) {
-        if (buf.length<2) return;
+        int blen=buf.length;
+        if (blen<2) return;
         if (buf[0]==(byte)'P') {
-            RecPic rp = new RecPic(buf.length-1);
-            rp.buf=Arrays.copyOfRange(buf,1,buf.length);
-            rp.len=buf.length-1;
+            int extlen=0;
+            while (extlen<blen-1 && buf[1+extlen]!=0) extlen++;
+            blen-=1+extlen+1;
+            if (blen<=0) return;
+            RecPic rp = new RecPic(blen-1 + 8);
+            rp.buf[0]=(byte)extlen;
+            System.arraycopy(buf,1,rp.buf,1,extlen);
+            System.arraycopy(buf,1+extlen+1,rp.buf,8, blen);
+            rp.len=blen+8;
             doOnRecPic(rp);
         } else if (buf[0]==(byte)'T') {
             RecText rt = new RecText(buf.length-1);
@@ -378,10 +388,33 @@ public class MqttInterface {
             // Új disconnect ciklus
             disconnectFuture = new CompletableFuture<>();
 
-            // CONNECTED vagy CONNECTING esetén is!
-            client.disconnect();
+            // CONNECTED vagy CONNECTING esetén
+            if (state == MqttClientState.CONNECTED) {
+                client.disconnect();
+            } else if (state == MqttClientState.CONNECTING) {
+                // CONNECTING megszakítása
+                client.disconnect();
+            }
+            else {
+                // fallback – biztonsági complete
+                disconnectFuture.complete(null);
+            }
 
             return disconnectFuture;
+        }
+    }
+
+    private void scheduleReconnect() {
+        if (openMode==OpenMode.omSENDER) {
+            Executors.newSingleThreadScheduledExecutor()
+                    .schedule(() -> {
+                        openSender(openMode);
+                    }, 2, TimeUnit.SECONDS);
+        } else if (openMode==OpenMode.omRECEIVER) {
+            Executors.newSingleThreadScheduledExecutor()
+                    .schedule(() -> {
+                        openReceiver();
+                    }, 2, TimeUnit.SECONDS);
         }
     }
 
@@ -409,7 +442,7 @@ public class MqttInterface {
                         .payload(cmd.getBytes(StandardCharsets.UTF_8))
                         .send();
             }).exceptionally(throwable -> {
-                close();
+                doClose();
                 doOnError("Internet hiba: "+throwable.getLocalizedMessage());
                 return null;
             })
@@ -438,7 +471,7 @@ public class MqttInterface {
                 .send()
             .whenComplete((sack,err) -> {
                 if (err != null) {
-                    close();
+                    doClose();
                     doOnError("Internet hiba: " + err.getLocalizedMessage());
                 }
             });
@@ -525,12 +558,48 @@ public class MqttInterface {
         return sb.toString();
     }
 
+    public boolean isOpen() { return mIsOpen; }
+
+    private void doClose() {
+        synchronized (lock) {
+            connectionChain = connectionChain
+            .exceptionally(e -> null)
+            .thenCompose(v -> {
+                if (openMode == OpenMode.omSENDER) {
+                    return CompletableFuture.allOf(
+                        client.publishWith()
+                            .topic(topicState)
+                            .payload(new byte[0])
+                            .retain(true)
+                            .send(),
+
+                        client.publishWith()
+                            .topic(topicBlank)
+                            .payload(new byte[0])
+                            .retain(true)
+                            .send(),
+
+                        client.publishWith()
+                            .topic(topicDia)
+                            .payload(new byte[0])
+                            .retain(true)
+                            .send()
+                    );
+                }
+
+                return CompletableFuture.completedFuture(null);
+            })
+
+            .thenCompose(v -> ensureDisconnected())
+            .exceptionally(e -> null);
+        }
+
+        mIsOpen=false;
+    }
+
     public void close() {
-        ensureDisconnected()
-                .exceptionally(throwable -> {
-                    return null;
-                });
-        isOpen=false;
+        doClose();
+        doOnOpenState(0);
     }
 
     public void chkLogin(String username, String psw) {
@@ -543,18 +612,22 @@ public class MqttInterface {
                 else doOnError("Hibás felhasználónév vagy jelszó");
             });
         });
-    }
+        }
 
 
     public boolean openSender(OpenMode om) {
+        doOnOpenState(-2);
         Channel="1";
         if (Username.isEmpty() || Channel.isEmpty() || Password.isEmpty()) {
-            doOnError("Hiányos internet belépési adatok!");
-            close();
+            //doOnError("Hiányos internet belépési adatok!");
+            doOnOpenState(0);
+            doClose();
             return false;
         }
-        if (om!=OpenMode.omSENDER && om!=OpenMode.omCHKLOGIN)
+        if (om!=OpenMode.omSENDER && om!=OpenMode.omCHKLOGIN) {
+            doOnOpenState(0);
             return false;
+        }
 
         topicGroup="Diatar/"+Username+"/"+Channel+"/";
         topicMask=topicGroup+"#";
@@ -562,60 +635,88 @@ public class MqttInterface {
         topicBlank=topicGroup+"blank";
         topicDia=topicGroup+"dia";
         openMode=om;
-        isOpen=true;
-        ensureDisconnected().thenCompose(v ->
-                client.connectWith()
-                    .simpleAuth()
-                    .username(Username)
-                    .password(Password.getBytes(StandardCharsets.UTF_8))
-                    .applySimpleAuth()
-                    .send()
-                        //.orTimeout(5, TimeUnit.SECONDS)
+        mIsOpen=true;
+        synchronized (lock) {
+            connectionChain = connectionChain
+                    .exceptionally(e -> null)
+                    .thenCompose(v -> ensureDisconnected())
+                    .thenCompose(v ->
+                        client.connectWith()
+                            .simpleAuth()
+                            .username(Username)
+                            .password(Password.getBytes(StandardCharsets.UTF_8))
+                            .applySimpleAuth()
+                            .send()
+                            //.orTimeout(5, TimeUnit.SECONDS)
                     .thenAccept(connAck -> {
                         if (connAck.getReturnCode() != Mqtt3ConnAckReturnCode.SUCCESS) {
-                            close();
+                            doClose();
                             doOnError("Sikertelen belépés! Név/jelszó hiba?");
+                            doOnOpenState(-1);
+                        } else {
+                            doOnOpenState(1);
                         }
                     })
-            .exceptionally(throwable -> {
-                        close();
-                        doOnError("Megnyitási hiba: "+throwable.getLocalizedMessage());
+                    .exceptionally(throwable -> {
+                        doClose();
+                        doOnError("Megnyitási hiba: " + throwable.getLocalizedMessage());
+                        doOnOpenState(-1);
                         return null;
                     }));
+        }
         return true;
     }
 
     public void openReceiver() {
-        Channel="1";
+
+        Channel = "1";
+
         if (Username.isEmpty() || Channel.isEmpty()) {
-            close();
+            doClose();
             return;
         }
-        topicGroup="Diatar/"+Username+"/"+Channel+"/";
-        topicMask=topicGroup+"#";
-        topicState=topicGroup+"state";
-        topicBlank=topicGroup+"blank";
-        topicDia=topicGroup+"dia";
-        openMode=OpenMode.omRECEIVER;
-        isOpen=true;
-        ensureDisconnected().thenCompose(v ->
-            client.connectWith()
-                .simpleAuth()
-                .username("receiver")
-                .password("receiverpsw".getBytes(StandardCharsets.UTF_8))
-                .applySimpleAuth()
-                .send()
 
-                .thenCompose(connAck -> {
-                    registerPublishHandler();
-                    return client.subscribeWith()
-                            .topicFilter(topicMask)
-                            .send();
-                }).exceptionally(throwable -> {
-                    close();
-                    doOnError("Megnyitási hiba: "+throwable.getLocalizedMessage());
-                    return null;
-                }));
+        topicGroup = "Diatar/" + Username + "/" + Channel + "/";
+        topicMask  = topicGroup + "#";
+        topicState = topicGroup + "state";
+        topicBlank = topicGroup + "blank";
+        topicDia   = topicGroup + "dia";
+
+        openMode = OpenMode.omRECEIVER;
+        mIsOpen = true;
+
+        synchronized (lock) {
+
+            connectionChain = connectionChain
+                    .exceptionally(e -> null)
+
+                    .thenCompose(v -> ensureDisconnected())
+
+                    .thenCompose(v ->
+                            client.connectWith()
+                                    .simpleAuth()
+                                    .username("receiver")
+                                    .password("receiverpsw".getBytes(StandardCharsets.UTF_8))
+                                    .applySimpleAuth()
+                                    .send()
+                    )
+
+                    .thenCompose(connAck ->
+                            client.subscribeWith()
+                                    .topicFilter(topicMask)
+                                    .send()
+                    )
+
+                    .thenAccept(subAck -> {
+                        registerPublishHandler();
+                    })
+
+                    .exceptionally(throwable -> {
+                        doClose();
+                        doOnError("Megnyitási hiba: " + throwable.getLocalizedMessage());
+                        return null;
+                    });
+        }
     }
 
     public void fillUserList() {
@@ -628,9 +729,10 @@ public class MqttInterface {
     // kuldo rutinok
     //**************************************************************
     public void sendState(RecState rec) {
-        if (!isOpen) return;
+        if (!mIsOpen) return;
         client.publishWith()
             .topic(topicState)
+            .retain(true)
             .payload(rec.buf)
             .send()
             .exceptionally(throwable -> {
@@ -640,12 +742,13 @@ public class MqttInterface {
     }
 
     public void sendTxt(RecText rec) {
-        if (!isOpen) return;
+        if (!mIsOpen) return;
         byte[] sendbuf = new byte[1+rec.buf.length];
         sendbuf[0]='T';
         System.arraycopy(rec.buf, 0,sendbuf, 1, rec.buf.length);
         client.publishWith()
             .topic(topicDia)
+            .retain(true)
             .payload(sendbuf)
             .send()
             .exceptionally(throwable -> {
@@ -655,12 +758,17 @@ public class MqttInterface {
     }
 
     public void sendPic(RecPic rec) {
-        if (!isOpen) return;
-        byte[] sendbuf = new byte[1+rec.buf.length];
+        if (!mIsOpen) return;
+        int extlen = rec.buf[0];
+        int sblen = 1 + rec.len-8 + extlen + 1;
+        byte[] sendbuf = new byte[sblen];
         sendbuf[0]='P';
-        System.arraycopy(rec.buf, 0,sendbuf, 1, rec.buf.length);
+        for (int i=0; i<extlen; i++) sendbuf[i+1]=rec.buf[i+1];
+        sendbuf[1+extlen]=0;
+        System.arraycopy(rec.buf, 8,sendbuf, 1+extlen+1, rec.len-8);
         client.publishWith()
             .topic(topicDia)
+            .retain(true)
             .payload(sendbuf)
             .send()
             .exceptionally(throwable -> {
@@ -670,9 +778,10 @@ public class MqttInterface {
     }
 
     public void sendBlank(RecBlank rec) {
-        if (!isOpen || rec==null) return;
+        if (!mIsOpen || rec==null) return;
         client.publishWith()
             .topic(topicBlank)
+            .retain(true)
             .payload(rec.buf)
             .send()
             .exceptionally(throwable -> {
@@ -687,7 +796,7 @@ public class MqttInterface {
 
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private static void runInMainThread(Runnable action) {
+    public static void runInMainThread(Runnable action) {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             action.run();
         } else {
@@ -724,6 +833,12 @@ public class MqttInterface {
             runInMainThread(() -> OnRecTextCallback.accept(rec));
     }
 
+    private void doOnOpenState(Integer state) {
+        if (OnOpenStateCallback!=null)
+            runInMainThread(() -> OnOpenStateCallback.accept(state));
+    }
+
+    //////////////////////////////////////////////////////////////////
     public void setErrCallback(Consumer<String> onError) {
         OnErrorCallback=onError;
     }
@@ -746,6 +861,10 @@ public class MqttInterface {
 
     public void setRecTextCallback(Consumer<RecText> onRecText) {
         OnRecTextCallback=onRecText;
+    }
+
+    public void setOpenState(Consumer<Integer> onOpenState) {
+        OnOpenStateCallback=onOpenState;
     }
 
     //**************************************************************

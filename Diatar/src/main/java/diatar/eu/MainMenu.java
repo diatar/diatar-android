@@ -47,7 +47,7 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	
 	protected void whenLoaded(boolean success, String fname) {}
 	
-	protected void whenSetNeted() {}
+	protected void whenSetNeted(boolean ok) {}
 
     protected void whenSetWebed(boolean ok) {
         if (ok) G.Save(this);
@@ -78,7 +78,7 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	protected static final int REQUEST_DTXING = 109;
 	protected static final int REQUEST_ZSOLOZSMA = 110;
 	
-	private void doMenuLoad() {
+	protected void doMenuLoad() {
 		if (G.OPEN_DIA_BY_FILESELECTOR) {
 			Intent it = new Intent(this, FileSelectorActivity.class);
 			it.putExtra(G.idDIR, G.sLoadDir);
@@ -91,49 +91,51 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 		}
 	}
 	
-	private void doLoading(String fname) {
+	protected void doLoading(String fname) {
 		Intent it = new Intent(this,DiaLoader.class);
 		it.putExtra(DiaLoader.itDIR,G.sLoadDir);
 		it.putExtra(DiaLoader.itFNAME,fname);
 		startActivityForResult(it,REQUEST_LOADING);
 	}
 
-	private void doMenuZsolozsma() {
+	protected void doMenuZsolozsma() {
 		Intent it = new Intent(this,ZsolActivity.class);
 		startActivityForResult(it,REQUEST_ZSOLOZSMA);
 	}
 
-	private void doMenuNet() {
+	protected void doMenuNet() {
+        TcpClient.getMe().closeMqtt();
 		Intent it = new Intent(this,SetNet.class);
 		startActivityForResult(it,REQUEST_NETING);
 	}
 
-    private void doMenuWeb() {
+    protected void doMenuWeb() {
+        TcpClient.getMe().closeMqtt();
         Intent it = new Intent(this,SetWeb.class);
         startActivityForResult(it,REQUEST_WEBING);
     }
 
-	private void doMenuDtx() {
+	protected void doMenuDtx() {
 		Intent it = new Intent(this,SetDtx.class);
 		startActivityForResult(it,REQUEST_DTXING);
 	}
 	
-	private void doMenuDown() {
+	protected void doMenuDown() {
 		Intent it = new Intent(this,SetDownload.class);
 		startActivityForResult(it,REQUEST_DOWNING);
 	}
 	
-	private void doMenuProj() {
+	protected void doMenuProj() {
 		Intent it = new Intent(this,SetProj.class);
 		startActivityForResult(it,REQUEST_PROJING);
 	}
 	
-	private void doMenuAbout() {
+	protected void doMenuAbout() {
 		Intent it = new Intent(this,SetAbout.class);
 		startActivity(it);
 	}
 	
-	private void doMenuEdit() {
+	protected void doMenuEdit() {
 		Intent it = new Intent(this,EditActivity.class);
 		startActivityForResult(it,REQUEST_EDITING);
 	}
@@ -175,11 +177,11 @@ public class MainMenu extends AppCompatActivity //FragmentActivity
 	}
 
 	private void reqNeting(int resultCode, Intent data) {
-		if (resultCode==RESULT_OK) whenSetNeted();
-	}
+        whenSetNeted(resultCode==RESULT_OK);
+    }
 
     private void reqWebing(int resultCode, Intent data) {
-        if (resultCode==RESULT_OK) whenSetWebed(resultCode==RESULT_OK);
+        whenSetWebed(resultCode==RESULT_OK);
     }
 
     private void reqDowning(int resultCode, Intent data) {

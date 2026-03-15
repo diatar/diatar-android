@@ -58,7 +58,12 @@ public class MainTxtView extends DiaViewBase
 		for (int i=0; i<arr.length; i++)
 			mTxtSizer.addLine(arr[i]);
 	}
-	
+
+    public void recalc() {
+        mTxtSizer.needrecalc=true;
+        invalidate();
+    }
+
 	@Override
 	protected void drawDia(Canvas canvas) {
 		mTxtSizer.Draw(canvas,canvas.getWidth(),canvas.getHeight());

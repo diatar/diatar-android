@@ -41,6 +41,7 @@ public class TcpThread extends Thread
 		} catch (Exception e) {
 			if (mRunning && mLastMS+15000+1000*mIndex < System.currentTimeMillis()) {
 				mParent.Err(getID()+" kapcsolódás nem sikerült:\n"+e.getLocalizedMessage());
+                mParent.doOpenChange(-1);
 				System.out.println("C: Create error");
 				mLastMS=System.currentTimeMillis();
 			}
@@ -73,6 +74,7 @@ public class TcpThread extends Thread
 						continue;
 					}
 					mParent.Msg(getID()+" Kapcsolódva!!!");
+                    mParent.doOpenChange(1);
 					mOuts=mClient.getOutputStream();
 					mIns=mClient.getInputStream();
 					mStateIsWaiting=true;
@@ -81,6 +83,7 @@ public class TcpThread extends Thread
 				}
 				if (!mClient.isConnected() || mClient.isClosed()) {
 					mParent.Msg(getID()+" Szétkapcsolva!");
+                    mParent.doOpenChange(0);
 					mClient=null;
 					continue;
 				}
@@ -162,12 +165,14 @@ public class TcpThread extends Thread
 					} catch(Exception e) {
 						mClient=null;
 						mParent.Msg(getID()+" Szétkapcsolva...");
+                        mParent.doOpenChange(-1);
 						sleep(10);
 					}
 					mLastMS = System.currentTimeMillis();
 				}
 			} catch(Exception e) {
 				mParent.Err(getID()+" Error: "+e.getLocalizedMessage());
+                mParent.doOpenChange(-1);
 				System.out.println("S: Error");
 				e.printStackTrace();
 			}

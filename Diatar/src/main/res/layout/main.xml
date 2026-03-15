@@ -15,86 +15,111 @@
 		android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
 		/>
 
-	<LinearLayout
-		android:orientation="vertical"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:id="@+id/MainControls1">
+    <LinearLayout
+        android:id="@+id/MainControls1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-		<GridLayout
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			rowCount="2"
-			columnCount="2">
+        <GridLayout
+            columnCount="2"
+            rowCount="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
 
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="Énektár:"
-				android:layout_width="wrap_content"
-				android:layout_weight="0"
-				android:layout_column="0"
-				android:layout_row="0"
-				android:layout_gravity="right|center_vertical"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:layout_column="0"
+                android:layout_gravity="right|center_vertical"
+                android:layout_weight="0"
+                android:text="Énektár:" />
 
-			<Spinner
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:layout_weight="1"
-				android:layout_column="1"
-				android:layout_row="0"
-				android:layout_gravity="center_vertical|fill_horizontal"
-				android:id="@+id/DtxLst"
-				android:layout_marginTop="2dp"/>
+            <Spinner
+                android:id="@+id/DtxLst"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="0"
+                android:layout_column="1"
+                android:layout_gravity="center_vertical|fill_horizontal"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1" />
 
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="Ének:"
-				android:layout_width="wrap_content"
-				android:layout_weight="0"
-				android:layout_gravity="right|center_vertical"
-				android:layout_column="0"
-				android:layout_row="1"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                android:layout_column="0"
+                android:layout_gravity="right|center_vertical"
+                android:layout_weight="0"
+                android:text="Ének:" />
 
-			<Spinner
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:layout_weight="1"
-				android:layout_column="1"
-				android:layout_row="1"
-				android:id="@+id/EnekLst"
-				android:layout_gravity="center_vertical|fill_horizontal"
-				android:layout_marginTop="2dp"/>
+            <Spinner
+                android:id="@+id/EnekLst"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="1"
+                android:layout_column="1"
+                android:layout_gravity="center_vertical|fill_horizontal"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1" />
 
-			<TextView
-				android:layout_height="wrap_content"
-				android:text="Dia:"
-				android:layout_width="wrap_content"
-				android:layout_weight="0"
-				android:layout_row="2"
-				android:layout_column="0"
-				android:layout_gravity="right|center_vertical"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="2"
+                android:layout_column="0"
+                android:layout_gravity="right|center_vertical"
+                android:layout_weight="0"
+                android:text="Dia:" />
 
-			<Spinner
-				android:layout_height="wrap_content"
-				android:layout_width="wrap_content"
-				android:layout_weight="1"
-				android:layout_row="2"
-				android:layout_column="1"
-				android:layout_gravity="center_vertical|fill_horizontal"
-				android:id="@+id/DiaLst"
-				android:layout_marginTop="2dp"/>
+            <Spinner
+                android:id="@+id/DiaLst"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_row="2"
+                android:layout_column="1"
+                android:layout_gravity="center_vertical|fill_horizontal"
+                android:layout_marginTop="2dp"
+                android:layout_weight="1" />
 
-		</GridLayout>
+        </GridLayout>
 
-	</LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-	<LinearLayout
+            <TextView
+                android:id="@+id/MainWebIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:gravity="center"
+                android:onClick="onWebIcon"
+                android:text="◍"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/MainLanIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:onClick="onLanIcon"
+                android:text="⌁"
+                android:textSize="30sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
 		android:orientation="vertical"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:id="@+id/MainControls2">
 
-		<HorizontalScrollView
+        <HorizontalScrollView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
 
